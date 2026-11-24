@@ -17,19 +17,18 @@
     byId('handoff-paper')?.remove();
   };
   window.addEventListener('afterprint', clearPaper);
+  window.matchMedia('print').addEventListener('change', event => {
+    if (!event.matches) clearPaper();
+  });
 
   let currentReview;
-  let panel;
-  let shortcut;
+  let dispose = clearPaper;
   const refresh = () => {
     const review = results.querySelector('.review-box');
     if (review === currentReview) return;
     currentReview = review;
-    panel?.remove();
-    shortcut?.remove();
-    panel = null;
-    shortcut = null;
-    clearPaper();
+    dispose();
+    dispose = clearPaper;
     if (!review || results.dataset.level === 'emergency') return;
 
     const story = byId('story').value.trim().slice(0, 8000);
@@ -40,34 +39,54 @@
     const reviewTitle = review.querySelector('h2').textContent;
     const guide = review.querySelector('a[target="_blank"]');
 
-    panel = create('section', '', 'handoff');
+    const panel = create('section', '', 'handoff');
+    panel.id = 'handoff-panel';
+    panel.hidden = true;
     panel.setAttribute('aria-labelledby', 'handoff-heading');
     const heading = create('h2', 'Prepare a clinician handoff');
     heading.id = 'handoff-heading';
     heading.tabIndex = -1;
-    shortcut = create('button', 'Prepare a clinician handoff', 'secondary handoff-shortcut');
+    const shortcut = create('button', 'Prepare a clinician handoff', 'secondary handoff-shortcut');
     shortcut.type = 'button';
-    shortcut.addEventListener('click', () => {
-      heading.focus({ preventScroll: true });
-      heading.scrollIntoView({ block: 'start' });
-    });
+    shortcut.setAttribute('aria-controls', panel.id);
+    shortcut.setAttribute('aria-expanded', 'false');
     const label = create('label', 'Your handoff note');
     label.htmlFor = 'handoff-draft';
     const draft = create('textarea');
     draft.id = 'handoff-draft';
     draft.rows = 7;
-    draft.value = [
-      story && `My symptom story\n${story}`,
-      notes && `My reviewed image notes\n${notes}`,
-      risk !== 'unknown' && `Higher risk of severe illness (my response)\n${byId('risk').selectedOptions[0].textContent}`,
-    ].filter(Boolean).join('\n\n');
+    draft.autocomplete = 'off';
+    draft.spellcheck = false;
+    let started = false;
+    shortcut.addEventListener('click', () => {
+      if (!panel.hidden) {
+        hideHandoff();
+        return;
+      }
+      if (!started) {
+        draft.value = [
+          story && `My symptom story\n${story}`,
+          notes && `My reviewed image notes\n${notes}`,
+          risk !== 'unknown' && `Higher risk of severe illness (my response)\n${byId('risk').selectedOptions[0].textContent}`,
+        ].filter(Boolean).join('\n\n');
+        started = true;
+        syncReview();
+      }
+      panel.hidden = false;
+      shortcut.setAttribute('aria-expanded', 'true');
+      shortcut.textContent = 'Hide clinician handoff';
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: 'start' });
+    });
 
     const includeReview = create('input');
     includeReview.type = 'checkbox';
     const includeLabel = create('label', '', 'handoff-check');
-    includeLabel.append(includeReview, create('span', 'Include Cluewell’s educational review'));
+    includeLabel.append(includeReview, create('span', 'Include the Cluewell review headline and guidance link'));
     const reviewPreview = create('div', '', 'handoff-review');
+    reviewPreview.id = 'handoff-review-preview';
     reviewPreview.hidden = true;
+    includeReview.setAttribute('aria-controls', reviewPreview.id);
     reviewPreview.append(create('p', reviewTitle));
     if (guide) {
       const guideLink = guide.cloneNode(true);
@@ -83,9 +102,12 @@
     copy.type = 'button';
     const print = create('button', 'Print handoff', 'secondary');
     print.type = 'button';
-    actions.append(copy, print);
+    const hide = create('button', 'Hide handoff', 'secondary');
+    hide.type = 'button';
+    actions.append(copy, print, hide);
 
     const status = create('p', '', 'handoff-status');
+    status.id = 'handoff-status';
     status.setAttribute('role', 'status');
     const fallback = create('div');
     fallback.hidden = true;
@@ -95,6 +117,8 @@
     copyText.id = 'handoff-copy-text';
     copyText.readOnly = true;
     copyText.rows = 7;
+    copyText.spellcheck = false;
+    copyText.setAttribute('aria-describedby', status.id);
     fallback.append(fallbackLabel, copyText);
 
     const sections = () => {
@@ -105,19 +129,36 @@
       return content;
     };
     const noteBody = () => ['Clinician handoff', ...sections().flatMap(({ heading, text }) => [heading, text])].join('\n\n');
-    const syncReview = () => {
-      reviewed.disabled = !draft.value.trim();
-      copy.disabled = print.disabled = !reviewed.checked;
+    let copyRevision = 0;
+    let copyInProgress = false;
+    const clearFallback = () => {
       fallback.hidden = true;
       copyText.value = '';
+    };
+    const syncReview = () => {
+      copyRevision++;
+      reviewed.disabled = !draft.value.trim();
+      copy.disabled = print.disabled = !reviewed.checked;
+      clearFallback();
       clearPaper();
     };
     const invalidateReview = () => {
       const wasReviewed = reviewed.checked;
       reviewed.checked = false;
       syncReview();
-      status.textContent = wasReviewed ? 'Note changed. Review it again before sharing.' : '';
+      if (wasReviewed) status.textContent = 'Note changed. Review it again before sharing.';
     };
+    const hideHandoff = () => {
+      reviewed.checked = false;
+      syncReview();
+      status.textContent = '';
+      panel.hidden = true;
+      shortcut.setAttribute('aria-expanded', 'false');
+      shortcut.textContent = 'Prepare a clinician handoff';
+      shortcut.focus({ preventScroll: true });
+      shortcut.scrollIntoView({ block: 'nearest' });
+    };
+    hide.addEventListener('click', hideHandoff);
     draft.addEventListener('input', invalidateReview);
     includeReview.addEventListener('change', () => {
       reviewPreview.hidden = !includeReview.checked;
@@ -129,24 +170,35 @@
     });
 
     copy.addEventListener('click', async () => {
-      if (!reviewed.checked || !draft.value.trim()) return;
+      if (copyInProgress || !reviewed.checked || !draft.value.trim()) return;
+      const revision = copyRevision;
       const content = noteBody();
-      const isCurrent = () => copy.isConnected && reviewed.checked && noteBody() === content;
+      const isCurrent = () => copy.isConnected && revision === copyRevision && reviewed.checked && noteBody() === content;
+      copyInProgress = true;
+      copy.setAttribute('aria-disabled', 'true');
+      clearFallback();
+      status.textContent = '';
       try {
         await navigator.clipboard.writeText(content);
         if (isCurrent()) status.textContent = 'Handoff copied.';
       } catch {
         if (!isCurrent()) return;
-        status.textContent = 'Use your device’s copy command to copy the selected handoff.';
         copyText.value = content;
         fallback.hidden = false;
-        copyText.focus();
-        copyText.select();
+        if (document.activeElement === copy) {
+          copyText.focus();
+          copyText.select();
+          status.textContent = 'Use your device’s copy command to copy the selected handoff.';
+        } else {
+          status.textContent = 'Select the handoff text below and use your device’s copy command.';
+        }
+      } finally {
+        copyInProgress = false;
+        copy.removeAttribute('aria-disabled');
       }
     });
     print.addEventListener('click', () => {
-      if (!reviewed.checked || !draft.value.trim()) return;
-      clearPaper();
+      if (byId('handoff-paper') || !reviewed.checked || !draft.value.trim()) return;
       const paper = create('article', '', 'handoff-paper');
       paper.id = 'handoff-paper';
       paper.append(create('h1', 'Clinician handoff'));
@@ -164,12 +216,25 @@
     });
     syncReview();
 
-    panel.append(heading, create('p', 'Edit your symptom story and add any questions you want to ask.'), label, draft, includeLabel, reviewPreview, reviewedLabel, actions, status, fallback);
+    panel.append(heading, create('p', 'Edit your symptom story and add any questions you want to ask. Confirm the note before copying or printing it.'), label, draft, includeLabel, reviewPreview, reviewedLabel, actions, status, fallback);
     results.after(panel);
     const reviewFoot = results.querySelector('.review-foot');
     (reviewFoot || review).append(shortcut);
+    dispose = () => {
+      draft.value = '';
+      reviewed.checked = false;
+      syncReview();
+      panel.remove();
+      shortcut.remove();
+    };
   };
 
   new MutationObserver(refresh).observe(results, { childList: true });
+  window.addEventListener('pagehide', () => {
+    dispose();
+    dispose = clearPaper;
+    currentReview = undefined;
+  });
+  window.addEventListener('pageshow', refresh);
   refresh();
 })();
