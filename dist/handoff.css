@@ -1,0 +1,128 @@
+.handoff {
+  max-width: 920px;
+  margin: 0 auto 50px;
+  padding: clamp(20px, 4vw, 42px);
+  border: 1px solid var(--line, #dcd1cf);
+  border-radius: 20px;
+  background: var(--surface, #fffdfa);
+}
+
+.handoff h2 {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.13;
+  margin-bottom: 12px;
+  scroll-margin-top: 1.25rem;
+}
+
+.handoff-shortcut {
+  margin-top: 8px;
+  margin-inline-end: 8px;
+}
+
+.handoff label {
+  display: block;
+  margin-top: 18px;
+  font-weight: 650;
+}
+
+.handoff textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid #b3a5ab;
+  border-radius: 10px;
+  background: #fff;
+  resize: vertical;
+}
+
+.handoff .handoff-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: fit-content;
+  min-height: 30px;
+  cursor: pointer;
+}
+
+.handoff-check input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin: 3px 0 0;
+  accent-color: var(--berry, #68394f);
+}
+
+.handoff-check:has(input:disabled) {
+  cursor: default;
+  color: var(--muted, #685f65);
+}
+
+.handoff-review {
+  margin: 4px 0 16px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--berry, #68394f);
+  background: var(--paper, #fbf9f5);
+}
+
+.handoff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.handoff-status:not(:empty) {
+  margin-top: 10px;
+  color: var(--muted, #685f65);
+}
+
+@media (max-width: 440px) {
+  .handoff-actions button {
+    flex: 1 1 115px;
+  }
+}
+
+.handoff-paper {
+  display: none;
+}
+
+@media print {
+  body.handoff-printing {
+    min-width: 0;
+    background: #fff;
+    color: #000;
+  }
+
+  body.handoff-printing > :not(.handoff-paper) {
+    display: none !important;
+  }
+
+  body.handoff-printing > .handoff-paper {
+    display: block;
+    color: #000;
+    font: 11pt/1.55 Arial, sans-serif;
+  }
+
+  .handoff-paper h1,
+  .handoff-paper h2 {
+    break-after: avoid;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+  }
+
+  .handoff-paper h1 {
+    margin-bottom: 16pt;
+    font-size: 19pt;
+  }
+
+  .handoff-paper h2 {
+    margin: 14pt 0 4pt;
+    font-size: 13pt;
+  }
+
+  .handoff-paper p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
