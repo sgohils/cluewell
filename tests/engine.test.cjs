@@ -68,7 +68,8 @@ for (const story of [
   "It feels like an elephant is sitting on my chest.",
   "I think I am having a heart attack.",
   "I can hardly breathe.",
-  "I can’t get enough air."
+  "I can't get enough air.",
+  "I can't get a breath."
 ]) {
   test("possible emergency takes priority: " + story, () => {
     const result = analyze(story);
