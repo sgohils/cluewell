@@ -55,6 +55,7 @@ function boot() {
   document.body.ownerDocument = document;
   document.activeElement = document.body;
   document.getElementById('startVoice').textContent = 'Start dictation';
+  document.getElementById('risk').value = 'unknown';
   const context = {
     document,
     window: {ClueEngine:{analyze}},
@@ -99,4 +100,17 @@ test('unconfirmed image notes stay out of review and are preserved for editing',
   assert.equal(get('imageNote').value, 'A printed note with symptom details');
   assert.equal(get('results').children.length, 0);
   assert.equal(get('photoConfirm').ownerDocument.activeElement, get('photoConfirm'));
+});
+
+test('confirmed image notes are labeled as a review input', () => {
+  const {get} = boot();
+  get('imageFile').files = [{type:'image/jpeg', size:12}];
+  get('imageFile').onchange({target:get('imageFile')});
+  get('imageNote').value = 'I have a runny nose and sneezing.';
+  get('photoConfirm').checked = true;
+  get('assessment').submit();
+  assert.equal(get('results').dataset.level, 'guidance');
+  assert.match(content(get('results')), /Input used: reviewed image notes\./);
+  assert.match(content(get('results')), /runny nose/);
+  assert.match(content(get('results')), /sneezing/);
 });
