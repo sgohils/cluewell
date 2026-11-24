@@ -1,7 +1,15 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const engine = require("../dist/engine.js");
-const {indexedSymptoms, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+const {indexedSymptoms, scoringExplanation, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+
+test("the evidence explorer explains score inputs, rounding, and its match threshold", () => {
+  assert.match(scoringExplanation, /shared-symptom count/);
+  assert.match(scoringExplanation, /selected symptoms/);
+  assert.match(scoringExplanation, /symptoms indexed for that article/);
+  assert.match(scoringExplanation, /rounded/);
+  assert.match(scoringExplanation, /at least two shared symptoms/);
+});
 
 test("the canonical symptom labels round-trip through the existing engine", () => {
   for (const symptom of indexedSymptoms) {

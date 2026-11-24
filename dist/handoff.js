@@ -176,6 +176,12 @@
       const isCurrent = () => copy.isConnected && revision === copyRevision && reviewed.checked && noteBody() === content;
       copyInProgress = true;
       copy.setAttribute('aria-disabled', 'true');
+      draft.readOnly = true;
+      includeReview.disabled = true;
+      reviewed.disabled = true;
+      print.disabled = true;
+      hide.disabled = true;
+      shortcut.disabled = true;
       clearFallback();
       status.textContent = '';
       try {
@@ -195,6 +201,15 @@
       } finally {
         copyInProgress = false;
         copy.removeAttribute('aria-disabled');
+        draft.readOnly = false;
+        includeReview.disabled = false;
+        print.disabled = false;
+        hide.disabled = false;
+        shortcut.disabled = false;
+        if (panel.isConnected) {
+          reviewed.disabled = !draft.value.trim();
+          copy.disabled = print.disabled = !reviewed.checked;
+        }
       }
     });
     print.addEventListener('click', () => {

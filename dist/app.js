@@ -143,7 +143,7 @@
     if (!file || !['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
       sampleRequest++;
       $('imageFile').value = '';
-      notify('Choose a PNG, JPEG or WebP image smaller than 5 MB.');
+      notify('Choose a PNG, JPEG or WebP image up to 5 MiB.');
       return false;
     }
     clearPhoto();

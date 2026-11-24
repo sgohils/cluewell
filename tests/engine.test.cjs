@@ -61,6 +61,7 @@ for (const story of [
   "Trouble catching my breath.",
   "No fever and cannot breathe.",
   "I have no appetite and difficulty breathing.",
+  "My lips went blue.",
   "No symptoms other than chest pain.",
   "Chest pain went away but just came back.",
   "My slurred speech went away.",

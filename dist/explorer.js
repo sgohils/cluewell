@@ -7,6 +7,7 @@
     "vomiting", "diarrhea", "loss of smell", "loss of taste",
     "itchy or watery eyes", "itchy nose or throat"
   ]);
+  const scoringExplanation = "Each score is the shared-symptom count divided by the square root of (selected symptoms × symptoms indexed for that article), multiplied by 100 and rounded. The list under a score shows the shared symptoms. An article needs at least two shared symptoms to appear as a match.";
 
   function recognizedSymptoms(signals) {
     return indexedSymptoms.filter(symptom => signals.includes(symptom));
@@ -38,7 +39,7 @@
   }
 
   if (typeof module === "object" && module.exports) {
-    module.exports = {indexedSymptoms, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
+    module.exports = {indexedSymptoms, scoringExplanation, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
     return;
   }
 
@@ -95,7 +96,8 @@
     const panel = create("details", "", "evidence-explorer");
     panel.append(
       create("summary", "What-if evidence explorer"),
-      create("p", "Add or remove symptoms to compare article similarity. Your care guidance comes from the original review above.")
+      create("p", "Add or remove symptoms to compare article similarity. Your care guidance comes from the original review above."),
+      create("p", scoringExplanation, "explorer-method")
     );
 
     const field = create("fieldset");
