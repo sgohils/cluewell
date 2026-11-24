@@ -15,7 +15,7 @@
   const concepts = [
     ["runny nose", /runny nose|running nose|nose (?:is |keeps )?running|nasal discharge/],
     ["nasal congestion", /nasal congestion|congested|congestion|(?:stuffy|blocked|stopped up|plugged) nose|nose (?:is |feels )?(?:stuffy|blocked|plugged)/],
-    ["sneezing", /sneez(?:e|es|ing)/],
+    ["sneezing", /sneez(?:e|es|ed|ing)/],
     ["sore throat", /sore throat|throat (?:is |feels )?sore|throat hurts|scratchy throat/],
     ["cough", /cough(?:s|ed|ing)?/],
     ["headache", /headache(?:s)?|head aches?/],

@@ -39,6 +39,12 @@ test("allergy symptoms retrieve the NHS article", () => {
   assert.equal(first.name, "Seasonal allergies");
 });
 
+test("past-tense sneeze wording counts toward article matching", () => {
+  const result = analyze("I sneezed repeatedly and have a runny nose.");
+  assert.ok(result.signals.includes("sneezing"));
+  assert.ok(result.matches.some(({name}) => name === "Common cold"));
+});
+
 test("plugged nose wording counts as nasal congestion", () => {
   const result = analyze("My nose is plugged and I have a cough.");
   assert.ok(result.signals.includes("nasal congestion"));
