@@ -111,6 +111,8 @@
   const directReport = /^\s*,?\s*(?:(?:i|we|he|she|they) (?:am|are|is|have|has|feel|feels|may be|might be)|i'm|we're|i've|we've|my|our|his|her|their)\b/;
   const futureQuestion = /^\s*(?:if |what if |what (?:should|can|do) (?:i|we) do if |will )(?:i|we|he|she|they) (?:later )?(?:get|develop|start|begin)\b/;
   const generalQuestion = /^\s*what (?:are|is) (?:the )?(?:(?:warning )?signs|symptoms) of (?:a |an )?/;
+  const remoteHistory = /\b(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|several|many)\s+)?(?:years?|months?) ago\b|\b(?:last|previous) year\b|\b(?:as a child|when i was (?:a )?child)\b/;
+  const currentTime = /\b(?:now|currently|today|again|returned|came back|back again|still|right now|this morning|this evening)\b/;
 
   // Translate explicit body readings before sentence splitting so decimal points stay intact.
   // Use a unitless measurement only to request clarification; never infer Celsius or Fahrenheit.
@@ -156,6 +158,8 @@
       for (const match of clause.matchAll(matcher)) {
         const before = clause.slice(0, match.index);
         const after = clause.slice(match.index + match[0].length);
+        // A clearly remote event is not a current warning sign unless the same clause also says it is happening again now.
+        if (warning && remoteHistory.test(clause) && !currentTime.test(clause)) continue;
         // Carry a negative across a coordinated list ("no fever, chills or cough").
         // A new affirmative verb resets the scope ("no fever, developed a cough").
         // "No appetite and difficulty breathing" may pair a denial with a new warning.

@@ -84,7 +84,10 @@
   };
   $('clearPhoto').onclick = () => { clearPhoto(); notify('Image and notes removed.'); $('photo').focus(); };
   $('assessment').addEventListener('input', event => {
-    if (event.target !== $('imageFile')) clearResults();
+    if (event.target === $('imageFile')) return;
+    clearResults();
+    const status = $('mediaStatus').textContent;
+    if (!/^(Listening|Reading the image|Downloading the English text reader|Checking the browser)/.test(status)) notify('');
   });
   note.addEventListener('input', () => { $('photoConfirm').checked = false; photoRevision++; });
   $('sources').onclick = () => $('sourcesDialog').showModal();

@@ -54,6 +54,20 @@ test("articles can enter or leave the comparison at the two-symptom threshold", 
   ]);
 });
 
+test("one shared symptom stays below threshold and appears as leaving evidence", () => {
+  const baseline = scoreSymptoms(engine, ["cough", "fever"]);
+  const hypothetical = scoreSymptoms(engine, ["fever", "itchy or watery eyes"]);
+  assert.deepEqual(hypothetical, []);
+
+  const comparison = compareMatches(baseline, hypothetical);
+  assert.deepEqual(comparison.map(({name, original, hypothetical}) => [
+    name, original?.matched.length, hypothetical
+  ]), [
+    ["Common cold", 2, null],
+    ["Flu and COVID-19", 2, null]
+  ]);
+});
+
 test("article URLs preserve provenance for scores on either side", () => {
   const baseline = scoreSymptoms(engine, ["cough", "fever"]);
   const hypothetical = scoreSymptoms(engine, ["cough", "sneezing"]);

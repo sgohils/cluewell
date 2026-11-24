@@ -97,6 +97,16 @@ test("a corrective clause after a comma resets an earlier warning denial", () =>
   assert.ok(result.signals.includes("chest pain or pressure"));
 });
 
+test("clearly remote warning signs do not become current without a current-time cue", () => {
+  for (const story of [
+    "I had chest pain ten years ago. Today I have a runny nose and sneezing.",
+    "My sister had chest pain years ago. I have a runny nose and sneezing."
+  ]) {
+    assert.equal(analyze(story).level, "guidance", story);
+  }
+  assert.equal(analyze("I had chest pain years ago, but my chest hurts again now.").level, "emergency");
+});
+
 for (const story of ["", "Cough.", "I fell on my ankle.", "I do not have fever, cough or sneezing.", "sneezing sneezing sneezing"]) {
   test("abstains for limited or outside-collection evidence: " + story, () => {
     assert.equal(analyze(story).level, "unknown");
