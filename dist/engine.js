@@ -76,16 +76,41 @@
     `fever (?:has (?:been |lasted |persisted )?)?(?:for (?:the past )?|lasting |lasted |over )?(?:(?:${feverDays})[- ]days?|(?:a|one|[1-9]\\d*) weeks?)`,
     `(?:day (?:${feverDays})|(?:${feverDays}) days?) of (?:a |my |the )?fever`
   ].join("|"));
-  const durationSubjects = ["symptoms?", ...concepts.map(([, pattern]) => pattern.source)].join("|");
-  const symptomDuration = new RegExp(`(?:${durationSubjects}) (?:has been |have been )?(?:for (?:the past )?|lasting |lasted )(?:${/(?:1[1-9]|[2-9]\d|\d{3,}|eleven|twelve|thirteen|fourteen) days|(?:two|three|four|five|six|seven|eight|nine|ten|[2-9]|[1-9]\d+) weeks?/.source})`);
+  const longDuration = /(?:(?:1[1-9]|[2-9]\d|\d{3,}|eleven|twelve|thirteen|fourteen) days|more than (?:10|ten) days|(?:two|three|four|five|six|seven|eight|nine|ten|[2-9]|[1-9]\d+) weeks?)/.source;
+  const noImprovement = /(?:no improvement|without improvement|not improving|not (?:getting|feeling) better)/.source;
+  const durationSubjects = [/symptoms?/, ...concepts.map(([, pattern]) => pattern)];
+  const durationSuffix = ` (?:that )?(?:has |have )?(?:been )?(?:for (?:the past )?|lasting |lasted )${longDuration}`;
+  const symptomDuration = new RegExp(`(?:${durationSubjects.map(pattern => pattern.source).join("|")})${durationSuffix}`);
+  const continuedSymptoms = new RegExp(`${symptomDuration.source}(?:,? and| with|,)? (?:(?:is|are) )?${noImprovement}`);
+  const improvementStatus = `(?:is |are |was |were )?${noImprovement}`;
+  const unnamedFollowUp = new RegExp(`^\\s*(?:(?:it|they) ${improvementStatus}|${noImprovement})\\s*$`);
+  const namedFollowUps = durationSubjects.map(pattern => ({
+    duration: new RegExp(`(?:${pattern.source})${durationSuffix}`),
+    status: new RegExp(`^\\s*(?:my |the )?(?:${pattern.source}) ${improvementStatus}\\s*$`)
+  }));
   const youngAge = /[1-9]|1[0-7]|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen/.source;
-  const spokenAge = `(?:${youngAge})(?:[- ]years?[- ]old|\\s*y/?o)`;
+  const spokenAge = `(?:${youngAge})(?:[- ](?:years?|yrs?)[- ]old|\\s*y/?o)`;
+  const infantAge = `(?:\\d+|${youngAge})[- ](?:months?|weeks?|days?)[- ]old`;
+  const ageIntroduction = "(?:i am|i'm|(?:my|our) (?:son|daughter|child|kid) is)";
   const pediatricContext = new RegExp([
-    "(?:my|our|the|a|an) (?:infant|toddler|baby|child|newborn)",
-    `(?:my|our) (?:${spokenAge}|(?:\\d+|${youngAge})[- ]months?[- ]old)`,
-    `(?:i am|i'm) (?:an? )?${spokenAge}`,
-    `(?:i am|i'm|(?:my|our) (?:son|daughter) is) (?:${youngAge})(?=\\s*(?:$|,|and\\b|with\\b))`
+    "(?:my|our|the) (?:infant|toddler|baby(?! shower)|child|newborn|kid)",
+    "(?:an?|this) (?:infant|toddler|baby|child|newborn|kid) (?=has\\b|is\\b|with\\b)",
+    `(?:my|our) (?:${spokenAge}|${infantAge})`,
+    `(?:an?|the) (?:${spokenAge}|${infantAge})(?= (?:child|kid|boy|girl|has|with)\\b)`,
+    `${ageIntroduction} (?:an? )?(?:${spokenAge}|${infantAge}|child|kid)`,
+    `${ageIntroduction} (?:${youngAge})(?=\\s*(?:$|,|and\\b|with\\b))`
   ].join("|"));
+
+  const temperatureValue = String.raw`[+-]?\d+(?:[.,]\d+)?`;
+  const temperatureUnit = String.raw`(?:\u00b0\s*|degrees?\s*)?(?:fahrenheit|celsius|[cf])\b`;
+  const ambientReadings = [
+    new RegExp(String.raw`\b(room|outdoors?|outside|indoors?|inside|oven|air|water|pool|weather|ambient|forecast)(?: temperature| temp)?(?: (?:is set to|says it will be|will be|is|was|reached|of|at|says|shows))?\s*[:=]?\s*${temperatureValue}(?:\s*${temperatureUnit})?(?!\w|[.,]\d)`, "g"),
+    new RegExp(String.raw`(^|[.!?;]\s*|\bit(?:'s| is| was| will be)\s+)${temperatureValue}\s*${temperatureUnit}\s+(?:outside|outdoors?|inside|indoors?|here)(?=\W|$)`, "g")
+  ];
+  const copiedGuidance = /^\s*(?:i (?:read|heard) that|(?:the |my )?(?:instructions|article|guide|leaflet|website) (?:says?|mentions?|lists?|warns?)|according to (?:my |the )?(?:discharge instructions|article|guide|leaflet))\b/;
+  const directReport = /^\s*,?\s*(?:(?:i|we|he|she|they) (?:am|are|is|have|has|feel|feels|may be|might be)|i'm|we're|i've|we've|my|our|his|her|their)\b/;
+  const futureQuestion = /^\s*(?:if |what if |what (?:should|can|do) (?:i|we) do if |will )(?:i|we|he|she|they) (?:later )?(?:get|develop|start|begin)\b/;
+  const generalQuestion = /^\s*what (?:are|is) (?:the )?(?:(?:warning )?signs|symptoms) of (?:a |an )?/;
 
   // Translate explicit body readings before sentence splitting so decimal points stay intact.
   // Use a unitless measurement only to request clarification; never infer Celsius or Fahrenheit.
@@ -105,7 +130,7 @@
   }
 
   function clausesFrom(story) {
-    const normalized = String(story ?? "").toLowerCase()
+    const expanded = String(story ?? "").toLowerCase()
       .replace(/[\u2018\u2019]/g, "'")
       .replace(/\b(?:can't|cant|can not)\b/g, "cannot")
       .replace(/\bwon'?t\b/g, "will not")
@@ -113,25 +138,24 @@
       .replace(/\bdoesn'?t\b/g, "does not")
       .replace(/\bdidn'?t\b/g, "did not")
       .replace(/\b(is|are|was|were|has|have|had)n'?t\b/g, "$1 not")
-      .replace(/\b(?:not sure|do not know|cannot tell|not certain)(?: (?:if|whether))?\b/g, "possibly")
-      .replace(/\bnot (?:only|just)\b/g, "")
-      .replace(/\b(?:room|outdoors?|outside|oven|air|water|weather|ambient|forecast)(?: temperature| temp)?(?: (?:is set to|says it will be|will be|is|was|reached|of|at|says|shows))?\s*[:=]?\s*[+-]?\d+(?:[.,]\d+)?\s*(?:°|degrees?)?\s*(?:fahrenheit|celsius|[cf])\b/g, " ambient reading ")
-      .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|says|measured|at|reached|has reached))?\s*[:=]?\s*)?(\d{2,3}(?:[.,]\d+)?)(?!\d|[.,]\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
-    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet)\b|\bor\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
-      .filter(Boolean);
+      .replace(/\b(?:not sure|do not know|cannot tell|not certain|have no idea)(?: (?:if|whether))?\b/g, "possibly")
+      .replace(/\bnot (?:only|just)\b/g, "");
+    const normalized = ambientReadings.reduce((story, pattern) => story.replace(pattern, "$1 ambient reading "), expanded)
+      .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|says|said|measured|at|reached|has reached|has been at))?\s*[:=]?\s*)?(\d{2,3}(?:[.,]\d+)?)(?!\d|[.,]\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
+    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet|despite)\b|\b(?:or|because)\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
+      .filter(clause => {
+        if (!clause || generalQuestion.test(clause) || futureQuestion.test(clause)) return false;
+        const reference = copiedGuidance.exec(clause);
+        return !reference || directReport.test(clause.slice(reference[0].length));
+      });
   }
 
   function asserted(clauses, pattern, warning = false) {
     const matcher = new RegExp("\\b(?:" + pattern.source + ")\\b", "g");
     return clauses.some(clause => {
-      const reference = /^\s*(?:i (?:read|heard) that|(?:the )?(?:instructions|article|guide) (?:says?|mentions?|lists?))\b/.exec(clause);
-      if (reference && !/\b(?:i|we|my|our|he|she|they|his|her|their)\b/.test(clause.slice(reference[0].length))) return false;
       for (const match of clause.matchAll(matcher)) {
         const before = clause.slice(0, match.index);
         const after = clause.slice(match.index + match[0].length);
-        // Keep uncertainty about a current symptom and skip clearly prospective questions.
-        const prospective = /^\s*(?:what )?if (?:i|we|he|she|they) (?:later )?(?:develop|start(?: to)?|begin(?: to)?) (?:a |an )?$/.test(before);
-        if (prospective) continue;
         // Carry a negative across a coordinated list ("no fever, chills or cough").
         // A new affirmative verb resets the scope ("no fever, developed a cough").
         // "No appetite and difficulty breathing" may pair a denial with a new warning.
@@ -139,7 +163,7 @@
         const scope = warning ? before.split(/\band\b/).pop() : before;
         const context = scope.split(/\b(?:also have)\b/).pop();
         const denied = /\b(?:no|without|den(?:y|ies|ied)|negative for|absence of|free of|never|not(?: having)?|zero)\b/.test(context);
-        const explicitlyAbsent = /^\s+(?:(?:is|are|has|have|had|was|were)\s+)?(?:absent|denied|ruled out|never happened)\b/.test(after);
+        const explicitlyAbsent = /^\s+(?:(?:is|are|has|have|had|was|were)\s+)?(?:absent|denied|ruled out|never happened|not (?:present|reported|observed|a symptom))\b(?!\s+until\b)/.test(after);
         const resolved = /^\s+(?:(?:is|are|has|have|had|was|were)\s+)?(?:gone|resolved|subsided|went away)\b/.test(after);
         // A recently described red flag can matter even when the symptom has subsided.
         if (!denied && !explicitlyAbsent && (warning || !resolved)) return true;
@@ -157,6 +181,16 @@
       matches.push({name: profile.name, url: profile.url, score, matched, explanation: profile.explanation});
     }
     return matches.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+  }
+
+  function hasPersistentSymptoms(clauses) {
+    if (asserted(clauses, continuedSymptoms)) return true;
+    return clauses.some((clause, index) => {
+      const nextClause = clauses[index + 1];
+      if (!nextClause || !asserted([clause], symptomDuration)) return false;
+      return unnamedFollowUp.test(nextClause) || namedFollowUps.some(({duration, status}) =>
+        status.test(nextClause) && asserted([clause], duration));
+    });
   }
 
   function analyze(story, options = {}) {
@@ -183,9 +217,7 @@
     const unclearReading = asserted(clauses, /ambiguous body temperature/);
     if (highReading) review.push("reported high temperature");
     if (unclearReading) review.push("temperature unit needs confirmation");
-    // Duration and lack of improvement are often reported in separate sentences.
-    if (asserted(clauses, symptomDuration) &&
-        asserted(clauses, /no improvement|not improving|not (?:getting|feeling) better/)) {
+    if (hasPersistentSymptoms(clauses)) {
       review.push("persistent symptoms without improvement");
     }
     if (options.risk === "yes") review.push("higher-risk context selected");

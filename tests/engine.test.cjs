@@ -244,3 +244,78 @@ test("common age wording routes pediatric notes outside the adult article collec
     assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
   }
 });
+
+test("explicit absence and current uncertainty retain distinct meanings", () => {
+  for (const story of ["Chest pain isn't present.", "Shortness of breath was not reported."]) {
+    assert.deepEqual(analyze(cold + " " + story), analyze(cold), story);
+  }
+  for (const story of ["I have no idea whether this is chest pressure.", "No fever despite difficulty breathing.", "Chest pain was not present until today."]) {
+    assert.equal(analyze(cold + " " + story).level, "emergency", story);
+  }
+});
+
+test("ambient temperatures do not replace a reported body reading", () => {
+  for (const context of ["It was 85 degrees Fahrenheit outside.", "The room temperature is 105.", "The pool temperature was 20°C."]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+  const result = analyze(cold + " It was 85°F outside. My temp has been at 105.2.");
+  assert.equal(result.level, "prompt");
+  assert.ok(result.signals.includes("temperature unit needs confirmation"));
+  assert.ok(!result.signals.includes("reported high temperature"));
+});
+
+test("quoted instructions and worries about future symptoms do not assert current symptoms", () => {
+  for (const context of [
+    "The leaflet says chest pain means I should call for help.",
+    "According to my discharge instructions, trouble breathing means I should call for help.",
+    "What should I do if I get severe chest pain tomorrow?",
+    "What if I get chest pain or trouble breathing tomorrow?",
+    "Will I develop trouble breathing?",
+    "What are the signs of a stroke?"
+  ]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+  for (const context of [
+    "The leaflet says chest pain means I should call for help, and I have chest pain.",
+    "What are the signs of a stroke? My face is drooping.",
+    "What are the signs of a stroke because my face is drooping?",
+    "The leaflet says I may be having a stroke.",
+    "I can't tell if I have chest pain."
+  ]) {
+    assert.equal(analyze(cold + " " + context).level, "emergency", context);
+  }
+});
+
+test("prolonged symptoms are linked to their own lack of improvement", () => {
+  for (const story of [
+    "I have been sneezing for more than 10 days without improvement.",
+    "I have had a cough for two weeks. My cough isn't getting better.",
+    "My cough has lasted 11 days and is not getting better."
+  ]) {
+    assert.ok(analyze(story).signals.includes("persistent symptoms without improvement"), story);
+  }
+  for (const story of [
+    "I have had a cough for 12 days. Today's headache is not getting better.",
+    "I have had a cough for 12 days. My Wi-Fi is not improving.",
+    "I have had a cough for 10 days with no improvement."
+  ]) {
+    assert.ok(!analyze(story).signals.includes("persistent symptoms without improvement"), story);
+  }
+});
+
+test("age reported for the current patient controls adult article eligibility", () => {
+  for (const story of [
+    "My daughter is 6 years old and has a runny nose and a sore throat.",
+    "My twelve-week-old has a runny nose and is sneezing.",
+    "A 16-year-old has a cough and a sore throat.",
+    "I am 17 yrs old and I have a runny nose and a sore throat."
+  ]) {
+    const result = analyze(story);
+    assert.equal(result.level, "prompt", story);
+    assert.equal(result.title, "Get age-specific guidance");
+    assert.deepEqual(result.matches, []);
+  }
+  for (const context of ["I had asthma as a child.", "I used to get this when I was a child.", "My baby shower is next week."]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+});
