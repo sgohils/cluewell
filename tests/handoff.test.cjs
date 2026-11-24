@@ -22,6 +22,11 @@ test('keyboard focus stays visible on handoff controls and its launcher', () => 
 test('print cleanup listens through modern and legacy MediaQueryList APIs', () => {
   assert.match(script, /if \(printMedia\.addEventListener\) printMedia\.addEventListener\('change', handlePrintMediaChange\);\s*else printMedia\.addListener\(handlePrintMediaChange\);/);
 });
+
+test('clipboard work exposes and clears the handoff busy state in all completion paths', () => {
+  assert.match(script, /copyInProgress = true;\s*panel\.setAttribute\('aria-busy', 'true'\);/);
+  assert.match(script, /finally \{[\s\S]*?panel\.setAttribute\('aria-busy', 'false'\);/);
+});
 test('closing a reviewed handoff clears confirmation before focus returns', () => {
   const close = script.match(/const hideHandoff = \(\) => \{([\s\S]*?)\n    \};/);
   assert.ok(close, 'the shared close action exists');

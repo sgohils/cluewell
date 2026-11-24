@@ -184,6 +184,7 @@
       const content = noteBody();
       const isCurrent = () => copy.isConnected && revision === copyRevision && reviewed.checked && noteBody() === content;
       copyInProgress = true;
+      panel.setAttribute('aria-busy', 'true');
       copy.setAttribute('aria-disabled', 'true');
       draft.readOnly = true;
       includeReview.disabled = true;
@@ -215,6 +216,7 @@
       } finally {
         window.clearTimeout(slowCopyTimer);
         copyInProgress = false;
+        panel.setAttribute('aria-busy', 'false');
         copy.removeAttribute('aria-disabled');
         draft.readOnly = false;
         includeReview.disabled = false;
