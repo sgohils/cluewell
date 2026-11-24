@@ -40,6 +40,12 @@ test("equal displayed scores remain tied", () => {
   assert.equal(result.matches[2].score, 63);
 });
 
+test("pounding-head wording counts as a headache", () => {
+  const result = analyze("My head is pounding and I have a runny nose.");
+  assert.ok(result.signals.includes("headache"));
+  assert.ok(result.matches.some(({name}) => name === "Common cold"));
+});
+
 test("allergy symptoms retrieve the NHS article", () => {
   const [first] = analyze("My eyes are itchy, I keep sneezing and I have a runny nose.").matches;
   assert.equal(first.name, "Seasonal allergies");

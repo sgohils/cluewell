@@ -18,7 +18,7 @@
     ["sneezing", /sneez(?:e|es|ed|ing)/],
     ["sore throat", /sore throat|throat (?:is |feels )?sore|throat hurts|scratchy throat/],
     ["cough", /cough(?:s|ed|ing)?/],
-    ["headache", /headache(?:s)?|head aches?/],
+    ["headache", /headache(?:s)?|head aches?|head is pounding|pounding headache/],
     ["body aches", /(?:body|muscle) (?:aches?|pain)|whole body (?:aches?|hurts?|pain)|(?:aching|achy|sore) muscles|my body aches/],
     ["fever", /fever(?:s|ish)?|raised temperature|high temperature/],
     ["chills", /chills|shivering/],
