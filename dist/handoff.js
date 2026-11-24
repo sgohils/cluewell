@@ -17,9 +17,12 @@
     byId('handoff-paper')?.remove();
   };
   window.addEventListener('afterprint', clearPaper);
-  window.matchMedia('print').addEventListener('change', event => {
+  const handlePrintMediaChange = event => {
     if (!event.matches) clearPaper();
-  });
+  };
+  const printMedia = window.matchMedia('print');
+  if (printMedia.addEventListener) printMedia.addEventListener('change', handlePrintMediaChange);
+  else printMedia.addListener(handlePrintMediaChange);
 
   let currentReview;
   let dispose = clearPaper;
@@ -146,7 +149,7 @@
       const wasReviewed = reviewed.checked;
       reviewed.checked = false;
       syncReview();
-      if (wasReviewed) status.textContent = 'Note changed. Review it again before sharing.';
+      status.textContent = wasReviewed ? 'Note changed. Review it again before sharing.' : '';
     };
     const hideHandoff = () => {
       reviewed.checked = false;
@@ -158,6 +161,12 @@
       shortcut.focus({ preventScroll: true });
       shortcut.scrollIntoView({ block: 'nearest' });
     };
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !panel.hidden) {
+        event.preventDefault();
+        hideHandoff();
+      }
+    });
     hide.addEventListener('click', hideHandoff);
     draft.addEventListener('input', invalidateReview);
     includeReview.addEventListener('change', () => {
@@ -175,6 +184,7 @@
       const content = noteBody();
       const isCurrent = () => copy.isConnected && revision === copyRevision && reviewed.checked && noteBody() === content;
       copyInProgress = true;
+      panel.setAttribute('aria-busy', 'true');
       copy.setAttribute('aria-disabled', 'true');
       draft.readOnly = true;
       includeReview.disabled = true;
@@ -206,6 +216,7 @@
       } finally {
         window.clearTimeout(slowCopyTimer);
         copyInProgress = false;
+        panel.setAttribute('aria-busy', 'false');
         copy.removeAttribute('aria-disabled');
         draft.readOnly = false;
         includeReview.disabled = false;

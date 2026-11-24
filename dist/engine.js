@@ -14,12 +14,12 @@
 
   const concepts = [
     ["runny nose", /runny nose|running nose|nose (?:is |keeps )?running|nasal discharge/],
-    ["nasal congestion", /nasal congestion|congested|congestion|(?:stuffy|blocked|stopped up) nose|nose (?:is |feels )?(?:stuffy|blocked)/],
-    ["sneezing", /sneez(?:e|es|ing)/],
+    ["nasal congestion", /nasal congestion|congested|congestion|(?:stuffy|blocked|stopped up|plugged) nose|nose (?:is |feels )?(?:stuffy|blocked|plugged)/],
+    ["sneezing", /sneez(?:e|es|ed|ing)/],
     ["sore throat", /sore throat|throat (?:is |feels )?sore|throat hurts|scratchy throat/],
     ["cough", /cough(?:s|ed|ing)?/],
-    ["headache", /headache(?:s)?|head aches?/],
-    ["body aches", /(?:body|muscle) (?:aches?|pain)|(?:aching|achy|sore) muscles|my body aches/],
+    ["headache", /headache(?:s)?|head aches?|head is pounding|pounding headache/],
+    ["body aches", /(?:body|muscle) (?:aches?|pain)|whole body (?:aches?|hurts?|pain)|(?:aching|achy|sore) muscles|my body aches/],
     ["fever", /fever(?:s|ish)?|raised temperature|high temperature/],
     ["chills", /chills|shivering/],
     ["fatigue", /fatigue(?:d)?|tired(?:ness)?|exhaust(?:ed|ion)/],
@@ -52,7 +52,7 @@
   // Group related phrases under labels a reader can check against the original note.
   const warningSigns = [
     ["possible heart attack, stroke or anaphylaxis", /(?:having|had|having another|signs of|symptoms of|this (?:is|might be|could be)) (?:a |an )?(?:heart attack|stroke|anaphyla(?:xis|ctic (?:shock|reaction)))/],
-    ["distress with breathing", /(?:can (?:hardly|barely)|struggl(?:e|ing) to) (?:get (?:any )?air|breathe|catch (?:my |a |their )?breath)|no way (?:i|they|she|he) can breathe|cannot (?:get (?:enough |any )?air|take a (?:deep )?breath)|unable to (?:get (?:enough |any )?air|take a breath)|(?:struggl(?:e|ing)|hard) to get (?:enough |any )?air|struggl(?:e|ing) for air|difficulty (?:in )?speaking (?:in )?full sentences/],
+    ["distress with breathing", /(?:can (?:hardly|barely)|struggl(?:e|ing) to) (?:get (?:any )?air|breathe|catch (?:my |a |their )?breath)|no way (?:i|they|she|he) can breathe|cannot (?:get (?:enough |any )?air|(?:get (?:a |any )?breath|take a (?:deep )?breath))|unable to (?:get (?:enough |any )?air|take a breath)|(?:struggl(?:e|ing)|hard) to get (?:enough |any )?air|struggl(?:e|ing) for air|difficulty (?:in )?speaking (?:in )?full sentences/],
     ["difficulty breathing", /(?:trouble|difficulty|problems?|struggling|struggle|hard time) (?:with |in |to )?(?:breath(?:e|ing)|catching (?:my |a |their )?breath)|(?:hard|difficult|harder) to breathe|(?:cannot(?: seem to)?|unable to|barely able to|can barely|no longer able to) (?:breathe|catch (?:my |a |their )?breath)|short(?:ness)? of breath|out of breath|gasping|labou?red breathing|breathless(?:ness)?|chok(?:e|ing)|breathing (?:is |feels )?(?:very |really )?(?:hard|difficult|labou?red)/],
     ["chest pain or pressure", /chest (?:pain|pressure|tightness|hurts|discomfort|ache|heaviness)|(?:pain|pressure|tightness|heaviness|squeezing|crushing) (?:in|on|across) (?:the (?:middle|center|centre) of )?(?:my |the |their )?chest|chest (?:is |feels )?(?:tight|heavy|crushed|squeezed)|(?:weight|elephant) (?:is |sitting )*on (?:my |the |their )?chest/],
     ["blue or gray lips or skin", /(?:blue|bluish|gr[ae]y) (?:lips|skin|face)|(?:lips|skin|face) (?:are |is |look |turning |turned |looked |seem |have turned |going |went )*(?:blue|bluish|gr[ae]y)/],

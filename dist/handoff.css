@@ -19,6 +19,12 @@
   margin-inline-end: 8px;
 }
 
+.handoff :focus-visible,
+.handoff-shortcut:focus-visible {
+  outline: 3px solid var(--berry, #68394f);
+  outline-offset: 3px;
+}
+
 .handoff label {
   display: block;
   margin-top: 18px;

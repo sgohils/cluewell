@@ -1,7 +1,9 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
 const engine = require("../dist/engine.js");
-const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches, describeSelection} = require("../dist/explorer.js");
 
 test("the evidence explorer explains score inputs, rounding, and its match threshold", () => {
   assert.match(scoringExplanation, /shared-symptom count/);
@@ -37,7 +39,18 @@ test("selection changes describe additions and removals independent of symptom o
   assert.equal(describeChanges(baseline, [...baseline].reverse()), "");
   assert.equal(describeChanges(baseline, ["sneezing", "cough", "headache"]),
     "Added cough, headache. Removed runny nose.");
+  assert.equal(describeChanges(["sneezing", "runny nose"], ["headache", "cough", "sneezing"]),
+    "Added cough, headache. Removed runny nose.");
   assert.equal(describeChanges(baseline, []), "Removed runny nose, sneezing.");
+});
+
+test("the live selection summary reports the original match count and threshold", () => {
+  assert.equal(describeSelection(["cough", "fever"], ["cough", "fever"], 2),
+    "The original symptoms are selected. 2 articles share at least two of the selected symptoms.");
+  assert.equal(describeSelection(["cough", "fever"], ["sneezing"], 1),
+    "Added sneezing. Removed cough, fever. One article shares at least two of the selected symptoms.");
+  assert.equal(describeSelection(["cough", "fever"], [], 0),
+    "Removed cough, fever. No articles share at least two of the selected symptoms.");
 });
 
 
@@ -118,4 +131,70 @@ test("comparing a selection with itself keeps one fully populated row per articl
   })));
   assert.equal(new Set(comparison.map(match => match.url)).size, comparison.length);
   assert.deepEqual(matches, before);
+});
+
+test("the browser explorer mounts, updates the comparison, and restores the original selection", () => {
+  class Element {
+    constructor(tagName) {
+      this.tagName = tagName;
+      this.children = [];
+      this.attributes = {};
+      this.listeners = {};
+      this.className = "";
+      this.value = "";
+      this.checked = false;
+      this.classList = {add: name => { this.className = [this.className, name].filter(Boolean).join(" "); }};
+    }
+    append(...children) { this.children.push(...children); }
+    replaceChildren(...children) { this.children = children; }
+    setAttribute(name, value) { this.attributes[name] = value; }
+    addEventListener(name, callback) { this.listeners[name] = callback; }
+    querySelector(selector) {
+      if (selector === ".evidence-explorer") return this.descendants().find(node => node.className.split(" ").includes("evidence-explorer")) ?? null;
+      return null;
+    }
+    querySelectorAll(selector) {
+      if (selector === ".signal-list li") return this.signalItems ?? [];
+      return this.descendants().filter(node => selector === "input" && node.tagName === "input");
+    }
+    descendants() { return this.children.flatMap(node => [node, ...node.descendants()]); }
+    get textContent() { return this._textContent ?? this.children.map(child => child.textContent).join(""); }
+    set textContent(value) { this._textContent = value; }
+  }
+  const evidence = new Element("section");
+  const results = new Element("main");
+  results.evidence = evidence;
+  results.signalItems = ["runny nose", "sneezing", "sore throat"].map(textContent => ({textContent}));
+  results.querySelector = selector => selector === ".evidence" ? evidence : null;
+  results.querySelectorAll = selector => selector === ".signal-list li" ? results.signalItems : [];
+  class Observer { constructor(callback) { this.callback = callback; } observe() {} }
+  const document = {getElementById: id => id === "results" ? results : null, createElement: tag => new Element(tag)};
+  const sandbox = {document, ClueEngine: engine, MutationObserver: Observer, URL, Map, Set};
+  vm.runInNewContext(fs.readFileSync(require.resolve("../dist/explorer.js"), "utf8"), sandbox);
+
+  const panel = evidence.querySelector(".evidence-explorer");
+  assert.ok(panel);
+  const controls = panel.querySelectorAll("input");
+  const sneezing = controls.find(control => control.value === "sneezing");
+  assert.equal(sneezing.checked, true);
+  const status = panel.descendants().find(node => node.className.split(" ").includes("explorer-status"));
+  assert.match(status.textContent, /The original symptoms are selected/);
+  const tableBody = panel.descendants().find(node => node.tagName === "tbody");
+  assert.ok(tableBody.children.length > 0);
+
+  sneezing.checked = false;
+  panel.descendants().find(node => node.tagName === "fieldset").listeners.change();
+  assert.match(status.textContent, /Removed sneezing/);
+  assert.ok(tableBody.children.length > 0);
+  assert.ok(panel.descendants().some(node => node.className.split(" ").includes("explorer-score-missing")));
+
+  for (const control of controls) control.checked = false;
+  panel.descendants().find(node => node.tagName === "fieldset").listeners.change();
+  assert.match(status.textContent, /No articles share at least two/);
+  assert.match(status.textContent, /Removed runny nose, sneezing, sore throat/);
+  assert.ok(tableBody.children.length > 0, "original rows remain for side-by-side context");
+
+  panel.descendants().find(node => node.className.split(" ").includes("explorer-reset")).listeners.click();
+  assert.equal(sneezing.checked, true);
+  assert.match(status.textContent, /The original symptoms are selected/);
 });

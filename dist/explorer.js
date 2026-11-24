@@ -22,8 +22,8 @@
   }
 
   function describeChanges(original, selected) {
-    const added = selected.filter(symptom => !original.includes(symptom));
-    const removed = original.filter(symptom => !selected.includes(symptom));
+    const added = indexedSymptoms.filter(symptom => selected.includes(symptom) && !original.includes(symptom));
+    const removed = indexedSymptoms.filter(symptom => original.includes(symptom) && !selected.includes(symptom));
     return [added.length && "Added " + added.join(", ") + ".", removed.length && "Removed " + removed.join(", ") + "."]
       .filter(Boolean).join(" ");
   }
@@ -39,8 +39,16 @@
     });
   }
 
+  function describeSelection(original, selected, hypotheticalCount) {
+    const changes = describeChanges(original, selected) || "The original symptoms are selected.";
+    const summary = hypotheticalCount === 1
+      ? "One article shares at least two of the selected symptoms."
+      : (hypotheticalCount || "No") + " articles share at least two of the selected symptoms.";
+    return changes + " " + summary;
+  }
+
   if (typeof module === "object" && module.exports) {
-    module.exports = {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
+    module.exports = {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches, describeSelection};
     return;
   }
 
@@ -57,7 +65,8 @@
 
   function scoreCell(match) {
     const cell = create("td");
-    const score = create("span", match ? match.score + "/100" : "Fewer than 2 shared symptoms", "explorer-score");
+    const score = create("span", match ? match.score + "/100" : "No match (fewer than 2 shared symptoms)",
+      "explorer-score" + (match ? "" : " explorer-score-missing"));
     cell.append(score);
     if (match) {
       score.classList.add("explorer-score-value");
@@ -142,16 +151,7 @@
       const selected = controls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
       const hypothetical = scoreSymptoms(ClueEngine, selected);
       renderComparison(body, original, hypothetical);
-      const changes = describeChanges(originalSymptoms, selected);
-      if (!changes) {
-        status.textContent = "The original symptoms are selected.";
-        return;
-      }
-      const count = hypothetical.length;
-      const summary = count === 1
-        ? "One article shares at least two of the selected symptoms."
-        : (count || "No") + " articles share at least two of the selected symptoms.";
-      status.textContent = changes + " " + summary;
+      status.textContent = describeSelection(originalSymptoms, selected, hypothetical.length);
     };
     field.addEventListener("change", update);
     reset.addEventListener("click", () => {
