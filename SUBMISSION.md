@@ -16,10 +16,11 @@ Browser speech recognition transcribes dictation where supported. A local visual
 
 ## What to show
 
-1. Load **Cold-like symptoms** and select **Review my symptoms**. Read the phrase-level evidence and open the calculation. The three scores can overlap.
+1. Load **Cold-like symptoms** and select **Review my symptoms**. Open **What-if evidence explorer**, switch off one recognized symptom, and compare the original and hypothetical scores side by side. The care guidance still reflects the actual story.
 2. Clear the form. Load the synthetic image note, extract its text and confirm the transcription. Submit. The same source-ranking process runs on the reviewed image input.
-3. Load **Urgent warning sign**. Submit again. The ranked articles give way to an emergency action with the triggering details.
-4. Try an unsupported story such as “My wrist clicks when I turn a doorknob.” Cluewell acknowledges that the collection cannot explain it.
+3. Open **Prepare a clinician handoff**. Edit the draft in your own words, add a question for your visit, and confirm the text before copying or printing it.
+4. Load **Urgent warning sign**. Submit again. The ranked articles and handoff give way to an emergency action with the triggering details.
+5. Try an unsupported story such as “My wrist clicks when I turn a doorknob.” Cluewell acknowledges that the collection cannot explain it.
 
 ## Scope and limitations
 

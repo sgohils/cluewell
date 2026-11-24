@@ -1,0 +1,91 @@
+#results .evidence-explorer {
+  margin-top: 24px;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid #d9cdce;
+  border-radius: 12px;
+  background: #fcf6f7;
+}
+
+#results .evidence-explorer summary {
+  width: fit-content;
+  cursor: pointer;
+  color: #653249;
+  font-weight: 700;
+}
+
+#results .evidence-explorer fieldset {
+  min-inline-size: 0;
+  margin: 16px 0;
+  padding: 0;
+  border: 0;
+}
+
+#results .evidence-explorer legend {
+  margin-bottom: 6px;
+  font-weight: 650;
+}
+
+#results .explorer-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+  gap: 2px 12px;
+}
+
+#results .explorer-choices label {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+#results .explorer-choices input {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #76364b;
+}
+
+#results .evidence-explorer table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: .9rem;
+  overflow-wrap: anywhere;
+}
+
+#results .evidence-explorer caption {
+  margin: 6px 0 4px;
+  text-align: left;
+  font-weight: 700;
+}
+
+#results .evidence-explorer th,
+#results .evidence-explorer td {
+  padding: 8px 4px;
+  border-bottom: 1px solid #d9cdce;
+  text-align: left;
+  vertical-align: top;
+}
+
+#results .evidence-explorer th:first-child {
+  width: 48%;
+}
+
+#results .explorer-shared {
+  display: block;
+  margin-top: 2px;
+  font-size: .82rem;
+  font-weight: 400;
+}
+
+#results .explorer-status {
+  font-size: .9rem;
+}
+
+#results .explorer-choices input:focus-visible,
+#results .explorer-reset:focus-visible {
+  outline: 3px solid #8b5374;
+  outline-offset: 3px;
+}

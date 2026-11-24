@@ -8,9 +8,14 @@
   <title>Cluewell · Symptom companion</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="results.css">
+  <link rel="stylesheet" href="explorer.css">
+  <link rel="stylesheet" href="handoff.css">
   <script src="engine.js" defer></script>
   <script src="print-reader.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="explorer.js" defer></script>
+  <script src="handoff.js" defer></script>
 </head>
 <body>
 <svg class="icon-set" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -28,14 +33,14 @@
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9v.3"/></symbol>
   </defs>
 </svg>
-<a class="skip" href="#assessment">Skip to symptom entry</a>
+<a class="skip" href="#story">Skip to symptom entry</a>
 <header class="topbar">
   <div class="shell nav-inner">
     <a href="#main" class="brand" aria-label="Cluewell home"><span class="logomark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Cluewell<span class="brand-dot">.</span></a>
     <nav aria-label="Main navigation">
       <a class="nav-active" href="#assessment">Symptom check</a>
-      <button type="button" class="nav-source" id="sources"><svg class="icon"><use href="#i-book"/></svg>Sources</button>
-      <a class="emergency-link" href="tel:911"><svg class="icon"><use href="#i-phone"/></svg><span>Emergency</span> 911</a>
+      <button type="button" class="nav-source" id="sources" aria-haspopup="dialog" aria-controls="sourcesDialog"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Sources</button>
+      <a class="emergency-link" href="tel:911" aria-label="Call 911 in an emergency"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span>Emergency</span> 911</a>
     </nav>
   </div>
 </header>
@@ -43,8 +48,9 @@
   <section class="hero" aria-labelledby="page-title">
     <div class="hero-copy">
       <p class="kicker"><span class="tiny-cross" aria-hidden="true">✳</span> Explainable symptom companion</p>
-      <h1 id="page-title">Make sense of<br><em>your symptoms.</em></h1>
+      <h1 id="page-title">Make sense of<br> <em>your symptoms.</em></h1>
       <p class="hero-deck">Explore what your symptoms have in common with published health guidance, and what to do next.</p>
+      <a class="hero-demo" href="#sample-cases"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg>Try a demo case <span aria-hidden="true">↘</span></a>
     </div>
     <div class="hero-art" aria-hidden="true"><canvas id="signalArt" width="800" height="420"></canvas></div>
   </section>
@@ -52,7 +58,7 @@
   <div class="workspace">
     <section class="form-card" aria-labelledby="form-heading">
       <div class="form-header">
-        <div class="form-title"><span class="form-icon"><svg class="icon"><use href="#i-pen"/></svg></span><h2 id="form-heading">Your symptom story</h2></div>
+        <div class="form-title"><span class="form-icon"><svg class="icon" aria-hidden="true"><use href="#i-pen"/></svg></span><h2 id="form-heading">Your symptom story</h2></div>
         <p>Where do you feel it, when did it start, and what has changed?</p>
       </div>
       <form id="assessment">
@@ -60,11 +66,11 @@
         <div class="editor">
           <textarea id="story" rows="4" placeholder="I woke up with a scratchy throat yesterday. Today my nose is running…" aria-describedby="entry-hint"></textarea>
           <div class="editor-actions">
-            <button id="voice" type="button" class="tool" aria-controls="voicePanel" aria-expanded="false"><svg class="icon"><use href="#i-mic"/></svg>Voice</button>
-            <button id="photo" type="button" class="tool" aria-controls="imagePanel"><svg class="icon"><use href="#i-image"/></svg>Add image</button>
+            <button id="voice" type="button" class="tool" aria-controls="voicePanel" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>Voice</button>
+            <button id="photo" type="button" class="tool" aria-controls="imagePanel"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg>Add image</button>
           </div>
         </div>
-        <p id="entry-hint" class="entry-hint">Use an example or leave out names and identifying details.</p>
+        <p id="entry-hint" class="entry-hint">Leave out names and identifying details.</p>
         <div id="voicePanel" class="media-panel" hidden>
           <h3>Dictate your story</h3>
           <p>Your browser may send audio to its speech provider. Review the transcript before continuing.</p>
@@ -89,34 +95,34 @@
         </div>
         <label class="check-line"><input type="checkbox" id="redflag"><span>I have an emergency warning sign now, such as trouble breathing or persistent chest pain.</span></label>
         <div class="form-footer">
-          <button type="submit" id="submit" class="primary"><svg class="icon"><use href="#i-spark"/></svg>Review my symptoms</button>
+          <button type="submit" id="submit" class="primary"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>Review my symptoms</button>
           <button id="clear" type="button" class="text-action">Clear entry</button>
         </div>
       </form>
     </section>
 
     <aside class="sidebar" aria-label="Sample cases and context">
-      <section class="sample-card">
-        <p class="kicker"><svg class="icon"><use href="#i-flask"/></svg> Demo cases</p>
-        <h2>Try a sample story.</h2>
-        <p>Use a fictional case to explore the companion.</p>
+      <section class="sample-card" id="sample-cases" aria-labelledby="sample-heading" tabindex="-1">
+        <p class="kicker"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg> Demo cases</p>
+        <h2 id="sample-heading">Try a sample story.</h2>
+        <p>Load a fictional case, then select Review my symptoms to see the result.</p>
         <div class="sample-list">
-          <button type="button" id="example" class="sample"><span class="sample-icon"><svg class="icon"><use href="#i-flower"/></svg></span><span>Cold-like symptoms</span><span class="load-label">Load</span></button>
-          <button type="button" id="urgentExample" class="sample"><span class="sample-icon urgent"><svg class="icon"><use href="#i-pulse"/></svg></span><span>Urgent warning sign</span><span class="load-label">Load</span></button>
+          <button type="button" id="example" class="sample"><span class="sample-icon"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span><span>Cold-like symptoms</span><span class="load-label">Load</span></button>
+          <button type="button" id="urgentExample" class="sample"><span class="sample-icon urgent"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></span><span>Urgent warning sign</span><span class="load-label">Load</span></button>
         </div>
       </section>
       <section class="context-note">
-        <svg class="icon"><use href="#i-info"/></svg><div><h3>About this check</h3><p>An educational prototype for adults in the U.S. Results explain source matches and cannot diagnose illness. In an emergency, <a href="tel:911">call 911</a>.</p></div>
+        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><div><h3>About this check</h3><p>An educational prototype for adults in the U.S. Results explain source matches and cannot diagnose illness. In an emergency, <a href="tel:911">call 911</a>.</p></div>
       </section>
     </aside>
   </div>
   <section id="results" tabindex="-1" aria-label="Your review" aria-live="polite"></section>
 </main>
 <footer class="shell page-footer"><span>Cluewell</span><span>Adult symptom companion · U.S. edition</span></footer>
-<dialog id="sourcesDialog" aria-labelledby="sources-title">
-  <div class="dialog-head"><span class="form-icon"><svg class="icon"><use href="#i-book"/></svg></span><button class="icon-button" type="button" id="closeSources" aria-label="Close sources"><svg class="icon"><use href="#i-cross"/></svg></button></div>
+<dialog id="sourcesDialog" aria-labelledby="sources-title" aria-describedby="sources-description">
+  <div class="dialog-head"><span class="form-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><button class="icon-button" type="button" id="closeSources" aria-label="Close sources"><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg></button></div>
   <h2 id="sources-title">Sources behind the check</h2>
-  <p>Each match in your review links to the public guidance behind it. Start with these references.</p>
+  <p id="sources-description">Each match in your review links to the public guidance behind it. Start with these references.</p>
   <ul class="sources-list">
     <li><a href="https://www.cdc.gov/common-cold/about/index.html" target="_blank" rel="noreferrer">About the common cold</a><span>Centers for Disease Control and Prevention</span></li>
     <li><a href="https://www.cdc.gov/common-cold/treatment/index.html" target="_blank" rel="noreferrer">Managing the common cold</a><span>Centers for Disease Control and Prevention</span></li>

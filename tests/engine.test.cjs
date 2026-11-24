@@ -159,3 +159,88 @@ test("reported fever with a stiff neck takes priority even if the unit is missin
     assert.deepEqual(result.matches, []);
   }
 });
+
+test("spoken breathing and chest descriptions keep warning priority", () => {
+  for (const story of [
+    "I’m struggling for air.",
+    "My breathing is very difficult.",
+    "I can’t seem to catch my breath.",
+    "I've got pain in the middle of my chest."
+  ]) {
+    const result = analyze(cold + " " + story);
+    assert.equal(result.level, "emergency", story);
+    assert.deepEqual(result.matches, []);
+  }
+});
+
+test("contracted denials do not trigger warning signs", () => {
+  for (const denial of ["I haven't had trouble breathing.", "My lips aren’t blue."]) {
+    assert.deepEqual(analyze(cold + " " + denial), analyze(cold), denial);
+  }
+});
+
+test("duration follows the reported symptom rather than an unrelated number", () => {
+  for (const story of [
+    "This is day five of my fever, with a runny nose.",
+    "My fever has persisted for 5 days and I have a sore throat.",
+    "I have been sneezing for 11 days with no improvement."
+  ]) {
+    assert.equal(analyze(story).level, "prompt", story);
+  }
+  for (const story of [
+    "I have a fever and a runny nose, but it started 4 days ago.",
+    "I have a fever and a runny nose. I travel in 11 days. The runny nose is not improving.",
+    "I have a runny nose that is not improving. My package arrived 14 days ago."
+  ]) {
+    assert.notEqual(analyze(story).level, "prompt", story);
+  }
+});
+
+test("temperature parsing distinguishes measured readings from ambient readings", () => {
+  const ambiguous = analyze(cold + " The thermometer says 105.2.");
+  assert.equal(ambiguous.level, "prompt");
+  assert.ok(ambiguous.signals.includes("temperature unit needs confirmation"));
+  const high = analyze(cold + " My body temperature measured 40,7 °C.");
+  assert.equal(high.level, "prompt");
+  assert.ok(high.signals.includes("reported high temperature"));
+  for (const context of ["The forecast says it will be 105°F.", "The oven is set to 104 °F."]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+});
+
+test("copied guidance and future scenarios do not become asserted symptoms", () => {
+  for (const context of [
+    "The instructions say to get help for chest pain or trouble breathing.",
+    "I read that throat swelling can be serious.",
+    "What if I develop chest pain tomorrow?"
+  ]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+});
+
+test("uncertain current symptoms and affirmative reports still trigger matching", () => {
+  for (const story of [
+    "I’m not sure if this is chest pain.",
+    "The instructions mention difficulty breathing. I am struggling to breathe.",
+    "The instructions say chest pain is serious, and I have chest pain now."
+  ]) {
+    assert.equal(analyze(cold + " " + story).level, "emergency", story);
+  }
+});
+
+test("common age wording routes pediatric notes outside the adult article collection", () => {
+  for (const story of [
+    "I’m 16 and I have a runny nose and a sore throat.",
+    "My 6yo son is sneezing and has a runny nose.",
+    "My eight-year-old has a runny nose and a sore throat."
+  ]) {
+    const result = analyze(story);
+    assert.equal(result.level, "prompt", story);
+    assert.equal(result.title, "Get age-specific guidance");
+    assert.deepEqual(result.matches, []);
+  }
+  assert.equal(analyze("My 6yo son is struggling for air.").level, "emergency");
+  for (const context of ["I am 16 minutes from home.", "I’m 36 years old."]) {
+    assert.deepEqual(analyze(cold + " " + context), analyze(cold), context);
+  }
+});

@@ -14,6 +14,10 @@ Open http://127.0.0.1:4173. Run `node --test tests/*.test.cjs` with Node 22 or l
 
 ## Reproduce the demo
 
+**Fastest judge walkthrough.** Load the cold example and review it. Open the **What-if evidence explorer**, change one symptom, and inspect which articles move. Prepare a clinician handoff, edit the note, and confirm the wording before copying or printing. Then load the urgent example and see which details cause the app to replace the evidence review with emergency guidance.
+
+To publish from GitHub, connect this repository to Netlify. The included configuration selects `dist` as the publish directory. To make a portable HTML copy locally, run `node tools/standalone.cjs Cluewell.html`. The test workflow also builds this copy for download from GitHub Actions.
+
 Load **Cold-like symptoms** and select **Review my symptoms**. Inspect the shared details in the three article cards and expand the scoring explanation. Replace the story with **Urgent warning sign**, submit, and inspect the emergency action and the phrases that triggered it.
 
 To exercise the image path, choose **Try an image note** or attach `dist/sample-note.png`. Select **Extract text**, review the words, confirm the notes, and submit. Use a different, clear note in uppercase monospace print to test the bundled recognizer on new input. The downloadable standalone edition embeds its sample image.
