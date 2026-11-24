@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf8f3">
+  <meta name="description" content="Explore adult symptom stories alongside public health guidance and see how each clue shapes the next step.">
+  <title>Cluewell · Symptom companion</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script src="engine.js" defer></script>
+  <script src="print-reader.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<svg class="icon-set" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C8.5 4.4 5.5 4.2 2.8 5.3v13.4c3.4-1.1 6.3-.6 9.2 1.2 3-1.8 5.8-2.3 9.2-1.2V5.3c-2.7-1.1-5.7-.9-9.2 1.2Zm0 0v13.4"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="m13.9 5.5 4.6 4.6M4 20l4.3-1 12-12a2 2 0 0 0 0-2.8l-.5-.5a2 2 0 0 0-2.8 0l-12 12L4 20Z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 1 0 14 0m-7 7v3m-3 0h6"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="8.5" r="1.4"/><path d="m4 17 5-5 3 2.5 3.5-4L21 17"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M10.5 3c.5 5 2 7 6.5 8-4.5.9-6 3-6.5 8-.8-4.8-2.3-7-6.6-8 4.5-1.2 6-3 6.6-8Zm8 12 .7 2.3 2.4.7-2.4.8-.7 2.3-.7-2.3-2.4-.8 2.4-.7.7-2.3Z"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v6l-6 9a2 2 0 0 0 1.7 3h12.6a2 2 0 0 0 1.7-3l-6-9V3m-7 12h10"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2 12h5l3-7 4 14 3-7h5"/></symbol>
+    <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 9c-3.9-9.2 3.9-9.2 0 0Zm2.1 1.3c5.4-8.5 9.3-1.6 0 0Zm0 3.4c9.4 1.6 5.3 8.5 0 0ZM12 15c3.9 9.2-3.9 9.2 0 0Zm-2.2-1.3c-5.3 8.5-9.2 1.6 0 0Zm0-3.4c-9.4-1.6-5.4-8.5 0 0Z"/><circle cx="12" cy="12" r="1.5"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M7.5 3.5c.8-.3 1.3.1 1.6.9l1.3 3.2c.3.8.2 1.3-.5 2l-1.4 1.3a15 15 0 0 0 4.6 4.6l1.4-1.4c.7-.7 1.1-.8 2-.5l3.1 1.3c.9.4 1.3.8 1 1.7l-.8 3a1.8 1.8 0 0 1-1.7 1.4C10 21.1 2.9 14 3 5.9c0-.8.5-1.5 1.4-1.7l3.1-.7Z"/></symbol>
+    <symbol id="i-cross" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9v.3"/></symbol>
+  </defs>
+</svg>
+<a class="skip" href="#assessment">Skip to symptom entry</a>
+<header class="topbar">
+  <div class="shell nav-inner">
+    <a href="#main" class="brand" aria-label="Cluewell home"><span class="logomark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Cluewell<span class="brand-dot">.</span></a>
+    <nav aria-label="Main navigation">
+      <a class="nav-active" href="#assessment">Symptom check</a>
+      <button type="button" class="nav-source" id="sources"><svg class="icon"><use href="#i-book"/></svg>Sources</button>
+      <a class="emergency-link" href="tel:911"><svg class="icon"><use href="#i-phone"/></svg><span>Emergency</span> 911</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="shell">
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <p class="kicker"><span class="tiny-cross" aria-hidden="true">✳</span> Explainable symptom companion</p>
+      <h1 id="page-title">Make sense of<br><em>your symptoms.</em></h1>
+      <p class="hero-deck">Explore what your symptoms have in common with published health guidance, and what to do next.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true"><canvas id="signalArt" width="800" height="420"></canvas></div>
+  </section>
+
+  <div class="workspace">
+    <section class="form-card" aria-labelledby="form-heading">
+      <div class="form-header">
+        <div class="form-title"><span class="form-icon"><svg class="icon"><use href="#i-pen"/></svg></span><h2 id="form-heading">Your symptom story</h2></div>
+        <p>Where do you feel it, when did it start, and what has changed?</p>
+      </div>
+      <form id="assessment">
+        <label class="sr-only" for="story">Describe your symptoms</label>
+        <div class="editor">
+          <textarea id="story" rows="4" placeholder="I woke up with a scratchy throat yesterday. Today my nose is running…" aria-describedby="entry-hint"></textarea>
+          <div class="editor-actions">
+            <button id="voice" type="button" class="tool" aria-controls="voicePanel" aria-expanded="false"><svg class="icon"><use href="#i-mic"/></svg>Voice</button>
+            <button id="photo" type="button" class="tool" aria-controls="imagePanel"><svg class="icon"><use href="#i-image"/></svg>Add image</button>
+          </div>
+        </div>
+        <p id="entry-hint" class="entry-hint">Use an example or leave out names and identifying details.</p>
+        <div id="voicePanel" class="media-panel" hidden>
+          <h3>Dictate your story</h3>
+          <p>Your browser may send audio to its speech provider. Review the transcript before continuing.</p>
+          <button id="startVoice" class="secondary" type="button">Start dictation</button>
+        </div>
+        <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        <div id="imagePanel" class="media-panel" hidden>
+          <div class="attachment-title"><h3>Image notes</h3><button class="text-action" type="button" id="clearPhoto">Remove image</button></div>
+          <img id="imagePreview" alt="Your selected image">
+          <p>Extract written text or describe what you see. Compatible browsers can suggest an on-device image description.</p>
+          <button id="extractText" type="button" class="secondary">Extract text</button>
+          <button id="describeImage" type="button" class="secondary">Suggest description</button>
+          <label for="imageNote">Your image description or extracted text</label>
+          <textarea id="imageNote" rows="3" placeholder="Add a description or correct the extracted text."></textarea>
+          <label class="check-line" for="photoConfirm"><input id="photoConfirm" type="checkbox"><span>I reviewed these notes and want to include them in my check.</span></label>
+        </div>
+        <p class="media-status" id="mediaStatus" role="status"></p>
+        <div class="context-row">
+          <label for="risk">Do you have a higher risk of severe illness?</label>
+          <select id="risk" aria-describedby="risk-hint"><option value="unknown">Unsure or unspecified</option><option value="yes">Yes</option><option value="no">No</option></select>
+          <p id="risk-hint" class="entry-hint">For example, you are 65 or older or have a weakened immune system.</p>
+        </div>
+        <label class="check-line"><input type="checkbox" id="redflag"><span>I have an emergency warning sign now, such as trouble breathing or persistent chest pain.</span></label>
+        <div class="form-footer">
+          <button type="submit" id="submit" class="primary"><svg class="icon"><use href="#i-spark"/></svg>Review my symptoms</button>
+          <button id="clear" type="button" class="text-action">Clear entry</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="sidebar" aria-label="Sample cases and context">
+      <section class="sample-card">
+        <p class="kicker"><svg class="icon"><use href="#i-flask"/></svg> Demo cases</p>
+        <h2>Try a sample story.</h2>
+        <p>Use a fictional case to explore the companion.</p>
+        <div class="sample-list">
+          <button type="button" id="example" class="sample"><span class="sample-icon"><svg class="icon"><use href="#i-flower"/></svg></span><span>Cold-like symptoms</span><span class="load-label">Load</span></button>
+          <button type="button" id="urgentExample" class="sample"><span class="sample-icon urgent"><svg class="icon"><use href="#i-pulse"/></svg></span><span>Urgent warning sign</span><span class="load-label">Load</span></button>
+        </div>
+      </section>
+      <section class="context-note">
+        <svg class="icon"><use href="#i-info"/></svg><div><h3>About this check</h3><p>An educational prototype for adults in the U.S. Results explain source matches and cannot diagnose illness. In an emergency, <a href="tel:911">call 911</a>.</p></div>
+      </section>
+    </aside>
+  </div>
+  <section id="results" tabindex="-1" aria-label="Your review" aria-live="polite"></section>
+</main>
+<footer class="shell page-footer"><span>Cluewell</span><span>Adult symptom companion · U.S. edition</span></footer>
+<dialog id="sourcesDialog" aria-labelledby="sources-title">
+  <div class="dialog-head"><span class="form-icon"><svg class="icon"><use href="#i-book"/></svg></span><button class="icon-button" type="button" id="closeSources" aria-label="Close sources"><svg class="icon"><use href="#i-cross"/></svg></button></div>
+  <h2 id="sources-title">Sources behind the check</h2>
+  <p>Each match in your review links to the public guidance behind it. Start with these references.</p>
+  <ul class="sources-list">
+    <li><a href="https://www.cdc.gov/common-cold/about/index.html" target="_blank" rel="noreferrer">About the common cold</a><span>Centers for Disease Control and Prevention</span></li>
+    <li><a href="https://www.cdc.gov/common-cold/treatment/index.html" target="_blank" rel="noreferrer">Managing the common cold</a><span>Centers for Disease Control and Prevention</span></li>
+    <li><a href="https://www.cdc.gov/flu/about/flu-vs-covid19.html" target="_blank" rel="noreferrer">Comparing flu and COVID-19</a><span>Centers for Disease Control and Prevention</span></li>
+    <li><a href="https://www.cdc.gov/winter-weather/prevention/index.html" target="_blank" rel="noreferrer">Preventing hypothermia and frostbite</a><span>Centers for Disease Control and Prevention</span></li>
+    <li><a href="https://www.nhs.uk/conditions/hay-fever/" target="_blank" rel="noreferrer">Hay fever</a><span>National Health Service</span></li>
+    <li><a href="https://medlineplus.gov/ency/article/003090.htm" target="_blank" rel="noreferrer">Fever</a><span>MedlinePlus Medical Encyclopedia</span></li>
+    <li><a href="https://medlineplus.gov/ency/article/001927.htm" target="_blank" rel="noreferrer">Recognizing medical emergencies</a><span>MedlinePlus Medical Encyclopedia</span></li>
+  </ul>
+</dialog>
+<script>
+// Hand-drawn-style wire surface. Only the illustration uses the canvas.
+(() => {
+  const canvas = document.querySelector('#signalArt');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const tau = Math.PI * 2;
+  const point = (u, v) => {
+    const bend = u + 0.37 * Math.sin(2 * u);
+    const radius = 1.28 + 0.22 * Math.cos(3 * u - 0.8);
+    const tube = 0.51 + 0.12 * Math.sin(2 * u + 0.5);
+    const x = (radius + tube * Math.cos(v)) * Math.cos(bend);
+    const y = (radius + tube * Math.cos(v)) * Math.sin(bend);
+    const z = 0.43 * Math.sin(2 * u + 0.3) + tube * Math.sin(v);
+    const yaw = x * 0.91 - y * 0.415;
+    const pitch = x * 0.415 + y * 0.91;
+    return [400 + 150 * (yaw + 0.22 * pitch), 210 - 130 * (pitch * .72 + z * .85 - yaw * .13), z * .72 - pitch * .68];
+  };
+  const cells = [];
+  for (let i = 0; i < 104; i++) for (let j = 0; j < 26; j++) {
+    const u = i * tau / 104, v = j * tau / 26;
+    const corners = [point(u,v),point(u+tau/104,v),point(u+tau/104,v+tau/26),point(u,v+tau/26)];
+    const depth = corners.reduce((sum,p) => sum + p[2],0)/4;
+    cells.push({corners,depth});
+  }
+  cells.sort((a,b)=>a.depth-b.depth);
+  for(const {corners,depth} of cells) {
+    const shade = Math.max(0,Math.min(1,(depth+1.6)/3));
+    const fill = [72+113*shade,31+58*shade,52+22*shade].map(Math.round);
+    const stroke = [121+127*shade,63+111*shade,72+70*shade].map(Math.round);
+    ctx.beginPath();
+    corners.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+    ctx.closePath();
+    ctx.fillStyle = 'rgb('+fill.join(',')+')';
+    ctx.fill();
+    ctx.lineWidth = 0.95;
+    ctx.strokeStyle = 'rgb('+stroke.join(',')+')';
+    ctx.stroke();
+  }
+})();
+</script>
+</body>
+</html>
