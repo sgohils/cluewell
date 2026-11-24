@@ -105,6 +105,13 @@ test("clearly remote warning signs do not become current without a current-time 
     assert.equal(analyze(story).level, "guidance", story);
   }
   assert.equal(analyze("I had chest pain years ago, but my chest hurts again now.").level, "emergency");
+  for (const story of [
+    "I had chest pain years ago. My chest feels tight.",
+    "My sister had chest pain years ago; now I can hardly breathe.",
+    "I had chest pain years ago, but today I am gasping for air."
+  ]) {
+    assert.equal(analyze(story).level, "emergency", story);
+  }
 });
 
 for (const story of ["", "Cough.", "I fell on my ankle.", "I do not have fever, cough or sneezing.", "sneezing sneezing sneezing"]) {

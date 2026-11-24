@@ -101,3 +101,21 @@ test("original and what-if scores can be equal with different shared symptoms", 
   assert.deepEqual(cold.original.matched, ["runny nose", "sneezing"]);
   assert.deepEqual(cold.hypothetical.matched, ["runny nose", "cough"]);
 });
+
+test("comparing a selection with itself keeps one fully populated row per article", () => {
+  const matches = scoreSymptoms(engine, ["runny nose", "sneezing", "cough"]);
+  const before = structuredClone(matches);
+  const comparison = compareMatches(matches, matches);
+
+  assert.deepEqual(comparison.map(({url, original, hypothetical}) => ({
+    url,
+    original: {score: original.score, matched: original.matched},
+    hypothetical: {score: hypothetical.score, matched: hypothetical.matched}
+  })), matches.map(match => ({
+    url: match.url,
+    original: {score: match.score, matched: match.matched},
+    hypothetical: {score: match.score, matched: match.matched}
+  })));
+  assert.equal(new Set(comparison.map(match => match.url)).size, comparison.length);
+  assert.deepEqual(matches, before);
+});

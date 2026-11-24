@@ -98,7 +98,7 @@
           <textarea id="imageNote" rows="3" placeholder="Add a description or correct the extracted text."></textarea>
           <label class="check-line" for="photoConfirm"><input id="photoConfirm" type="checkbox"><span>I reviewed these notes and want to include them in my check.</span></label>
         </div>
-        <p class="media-status" id="mediaStatus" role="status"></p>
+        <p class="media-status" id="mediaStatus" role="status" aria-live="polite" aria-atomic="true"></p>
         <div class="context-row">
           <label for="risk">Do you have a higher risk of severe illness?</label>
           <select id="risk" aria-describedby="risk-hint"><option value="unknown">Unsure or unspecified</option><option value="yes">Yes</option><option value="no">No</option></select>

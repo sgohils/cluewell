@@ -183,7 +183,12 @@
       hide.disabled = true;
       shortcut.disabled = true;
       clearFallback();
-      status.textContent = '';
+      status.textContent = 'Copying handoff…';
+      const slowCopyTimer = window.setTimeout(() => {
+        if (copyInProgress && isCurrent()) {
+          status.textContent = 'Clipboard access is taking longer than expected. Keep this handoff open while your browser finishes.';
+        }
+      }, 5000);
       try {
         await navigator.clipboard.writeText(content);
         if (isCurrent()) status.textContent = 'Handoff copied.';
@@ -199,6 +204,7 @@
           status.textContent = 'Select the handoff text below and use your device’s copy command.';
         }
       } finally {
+        window.clearTimeout(slowCopyTimer);
         copyInProgress = false;
         copy.removeAttribute('aria-disabled');
         draft.readOnly = false;
