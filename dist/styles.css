@@ -132,7 +132,7 @@ select { appearance:none; max-width:100%; border:1px solid #d7ccc4; border-radiu
 .context-note p { font-size:.9rem; color:var(--muted); line-height:1.55; margin-top:.25rem }
 .page-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.3rem 1rem; margin-top:2rem; padding:1rem 0 1.6rem; color:var(--muted); border-top:1px solid var(--line); font-size:.81rem }
 .page-footer span:first-child { font-family:var(--serif); font-weight:600; font-size:1.24rem; color:var(--plum); letter-spacing:-.05em }
-dialog { border:1px solid var(--line); border-radius:15px; color:var(--ink); background:var(--surface); padding:clamp(1rem,4vw,1.65rem); width:min(34rem,calc(100% - 2rem)); max-height:85vh; overflow:auto; overscroll-behavior:contain; box-shadow:0 20px 80px #2a152d30 }
+dialog { border:1px solid var(--line); border-radius:15px; color:var(--ink); background:var(--surface); padding:clamp(1rem,4vw,1.65rem); width:min(34rem,calc(100% - 2rem)); max-height:min(85vh,48rem); max-height:min(85dvh,48rem); overflow:auto; overscroll-behavior:contain; box-shadow:0 20px 80px #2a152d30 }
 dialog::backdrop { background:#24182180 }
 .dialog-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:.8rem }
 .icon-button { width:44px; padding:0 }
