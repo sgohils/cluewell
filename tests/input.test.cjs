@@ -25,6 +25,7 @@ class Element {
   append(...children) { this.children.push(...children); }
   replaceChildren(...children) { this.children = children; }
   addEventListener(name, callback) { (this.listeners[name] ||= []).push(callback); }
+  dispatch(name, event = {}) { for (const fn of this.listeners[name] || []) fn({target:this, ...event}); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   removeAttribute(name) { delete this.attributes[name]; }
   focus() { this.ownerDocument.activeElement = this; }
@@ -113,4 +114,17 @@ test('confirmed image notes are labeled as a review input', () => {
   assert.match(content(get('results')), /Input used: reviewed image notes\./);
   assert.match(content(get('results')), /runny nose/);
   assert.match(content(get('results')), /sneezing/);
+});
+
+test('editing confirmed image notes revokes confirmation before submission', () => {
+  const {get} = boot();
+  get('imageFile').files = [{type:'image/webp', size:12}];
+  get('imageFile').onchange({target:get('imageFile')});
+  get('imageNote').value = 'I have a runny nose and sneezing.';
+  get('photoConfirm').checked = true;
+  get('imageNote').dispatch('input');
+  assert.equal(get('photoConfirm').checked, false);
+  get('assessment').submit();
+  assert.match(get('mediaStatus').textContent, /check the confirmation box/);
+  assert.equal(get('results').children.length, 0);
 });
