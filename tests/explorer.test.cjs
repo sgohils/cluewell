@@ -188,6 +188,12 @@ test("the browser explorer mounts, updates the comparison, and restores the orig
   assert.ok(tableBody.children.length > 0);
   assert.ok(panel.descendants().some(node => node.className.split(" ").includes("explorer-score-missing")));
 
+  for (const control of controls) control.checked = false;
+  panel.descendants().find(node => node.tagName === "fieldset").listeners.change();
+  assert.match(status.textContent, /No articles share at least two/);
+  assert.match(status.textContent, /Removed runny nose, sneezing, sore throat/);
+  assert.ok(tableBody.children.length > 0, "original rows remain for side-by-side context");
+
   panel.descendants().find(node => node.className.split(" ").includes("explorer-reset")).listeners.click();
   assert.equal(sneezing.checked, true);
   assert.match(status.textContent, /The original symptoms are selected/);
