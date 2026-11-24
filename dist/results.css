@@ -163,5 +163,7 @@
   #results { max-width: none; margin: 0 }
   #results .review-box, #results .evidence, #results .review-foot { padding: .6rem .9rem }
   #results button { display: none }
+  #results .method:not([open]) > :not(summary) { display: block !important }
+  #results .method summary { display: none }
   #results .review-box, #results .source-match, #results details { break-inside: avoid }
 }
