@@ -146,7 +146,7 @@
       const wasReviewed = reviewed.checked;
       reviewed.checked = false;
       syncReview();
-      if (wasReviewed) status.textContent = 'Note changed. Review it again before sharing.';
+      status.textContent = wasReviewed ? 'Note changed. Review it again before sharing.' : '';
     };
     const hideHandoff = () => {
       reviewed.checked = false;
@@ -158,6 +158,12 @@
       shortcut.focus({ preventScroll: true });
       shortcut.scrollIntoView({ block: 'nearest' });
     };
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !panel.hidden) {
+        event.preventDefault();
+        hideHandoff();
+      }
+    });
     hide.addEventListener('click', hideHandoff);
     draft.addEventListener('input', invalidateReview);
     includeReview.addEventListener('change', () => {
