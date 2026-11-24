@@ -22,8 +22,8 @@
   }
 
   function describeChanges(original, selected) {
-    const added = selected.filter(symptom => !original.includes(symptom));
-    const removed = original.filter(symptom => !selected.includes(symptom));
+    const added = indexedSymptoms.filter(symptom => selected.includes(symptom) && !original.includes(symptom));
+    const removed = indexedSymptoms.filter(symptom => original.includes(symptom) && !selected.includes(symptom));
     return [added.length && "Added " + added.join(", ") + ".", removed.length && "Removed " + removed.join(", ") + "."]
       .filter(Boolean).join(" ");
   }

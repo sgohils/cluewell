@@ -37,6 +37,8 @@ test("selection changes describe additions and removals independent of symptom o
   assert.equal(describeChanges(baseline, [...baseline].reverse()), "");
   assert.equal(describeChanges(baseline, ["sneezing", "cough", "headache"]),
     "Added cough, headache. Removed runny nose.");
+  assert.equal(describeChanges(["sneezing", "runny nose"], ["headache", "cough", "sneezing"]),
+    "Added cough, headache. Removed runny nose.");
   assert.equal(describeChanges(baseline, []), "Removed runny nose, sneezing.");
 });
 
