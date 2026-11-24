@@ -142,7 +142,7 @@
       .replace(/\bnot (?:only|just)\b/g, "");
     const normalized = ambientReadings.reduce((story, pattern) => story.replace(pattern, "$1 ambient reading "), expanded)
       .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|says|said|measured|at|reached|has reached|has been at))?\s*[:=]?\s*)?(\d{2,3}(?:[.,]\d+)?)(?!\d|[.,]\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
-    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet|despite)\b|\b(?:or|because)\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
+    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet|despite)\b|,\s*(?=actually\b)|\b(?:or|because)\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
       .filter(clause => {
         if (!clause || generalQuestion.test(clause) || futureQuestion.test(clause)) return false;
         const reference = copiedGuidance.exec(clause);

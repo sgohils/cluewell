@@ -1,7 +1,7 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const engine = require("../dist/engine.js");
-const {indexedSymptoms, scoringExplanation, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
 
 test("the evidence explorer explains score inputs, rounding, and its match threshold", () => {
   assert.match(scoringExplanation, /shared-symptom count/);
@@ -9,6 +9,13 @@ test("the evidence explorer explains score inputs, rounding, and its match thres
   assert.match(scoringExplanation, /symptoms indexed for that article/);
   assert.match(scoringExplanation, /rounded/);
   assert.match(scoringExplanation, /at least two shared symptoms/);
+});
+
+test("the comparison table announces its horizontal scroll behavior to keyboard and screen-reader users", () => {
+  assert.match(comparisonRegionLabel, /Article comparison/);
+  assert.match(comparisonRegionLabel, /small screens/);
+  assert.match(comparisonRegionLabel, /scroll horizontally/);
+  assert.match(comparisonRegionLabel, /Original and What-if scores/);
 });
 
 test("the canonical symptom labels round-trip through the existing engine", () => {

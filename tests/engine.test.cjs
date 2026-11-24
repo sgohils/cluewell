@@ -91,6 +91,12 @@ test("negated signs in a list and explicit corrections do not become positive ev
   assert.deepEqual(analyze("No fever, just a cough and sore throat.").signals.sort(), ["cough", "sore throat"]);
 });
 
+test("a corrective clause after a comma resets an earlier warning denial", () => {
+  const result = analyze("No trouble breathing, actually my chest hurts.");
+  assert.equal(result.level, "emergency");
+  assert.ok(result.signals.includes("chest pain or pressure"));
+});
+
 for (const story of ["", "Cough.", "I fell on my ankle.", "I do not have fever, cough or sneezing.", "sneezing sneezing sneezing"]) {
   test("abstains for limited or outside-collection evidence: " + story, () => {
     assert.equal(analyze(story).level, "unknown");
