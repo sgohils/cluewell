@@ -1,7 +1,7 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const engine = require("../dist/engine.js");
-const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches, describeSelection} = require("../dist/explorer.js");
 
 test("the evidence explorer explains score inputs, rounding, and its match threshold", () => {
   assert.match(scoringExplanation, /shared-symptom count/);
@@ -38,6 +38,15 @@ test("selection changes describe additions and removals independent of symptom o
   assert.equal(describeChanges(baseline, ["sneezing", "cough", "headache"]),
     "Added cough, headache. Removed runny nose.");
   assert.equal(describeChanges(baseline, []), "Removed runny nose, sneezing.");
+});
+
+test("the live selection summary reports the original match count and threshold", () => {
+  assert.equal(describeSelection(["cough", "fever"], ["cough", "fever"], 2),
+    "The original symptoms are selected. 2 articles share at least two of the selected symptoms.");
+  assert.equal(describeSelection(["cough", "fever"], ["sneezing"], 1),
+    "Added sneezing. Removed cough, fever. One article shares at least two of the selected symptoms.");
+  assert.equal(describeSelection(["cough", "fever"], [], 0),
+    "Removed cough, fever. No articles share at least two of the selected symptoms.");
 });
 
 

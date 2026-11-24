@@ -39,8 +39,16 @@
     });
   }
 
+  function describeSelection(original, selected, hypotheticalCount) {
+    const changes = describeChanges(original, selected) || "The original symptoms are selected.";
+    const summary = hypotheticalCount === 1
+      ? "One article shares at least two of the selected symptoms."
+      : (hypotheticalCount || "No") + " articles share at least two of the selected symptoms.";
+    return changes + " " + summary;
+  }
+
   if (typeof module === "object" && module.exports) {
-    module.exports = {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
+    module.exports = {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches, describeSelection};
     return;
   }
 
@@ -142,16 +150,7 @@
       const selected = controls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
       const hypothetical = scoreSymptoms(ClueEngine, selected);
       renderComparison(body, original, hypothetical);
-      const changes = describeChanges(originalSymptoms, selected);
-      if (!changes) {
-        status.textContent = "The original symptoms are selected.";
-        return;
-      }
-      const count = hypothetical.length;
-      const summary = count === 1
-        ? "One article shares at least two of the selected symptoms."
-        : (count || "No") + " articles share at least two of the selected symptoms.";
-      status.textContent = changes + " " + summary;
+      status.textContent = describeSelection(originalSymptoms, selected, hypothetical.length);
     };
     field.addEventListener("change", update);
     reset.addEventListener("click", () => {
