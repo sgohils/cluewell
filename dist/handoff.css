@@ -72,6 +72,11 @@
   margin-top: 14px;
 }
 
+.handoff-actions button[aria-disabled="true"] {
+  cursor: default;
+  opacity: .58;
+}
+
 .handoff-status:not(:empty) {
   margin-top: 10px;
   color: var(--muted, #685f65);
@@ -88,6 +93,11 @@
 }
 
 @media print {
+  .handoff,
+  .handoff-shortcut {
+    display: none !important;
+  }
+
   body.handoff-printing {
     min-width: 0;
     background: #fff;
@@ -124,5 +134,7 @@
   .handoff-paper p {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    orphans: 2;
+    widows: 2;
   }
 }

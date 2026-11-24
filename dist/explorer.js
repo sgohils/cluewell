@@ -19,19 +19,26 @@
     return engine.analyze(story).matches;
   }
 
+  function describeChanges(original, selected) {
+    const added = selected.filter(symptom => !original.includes(symptom));
+    const removed = original.filter(symptom => !selected.includes(symptom));
+    return [added.length && "Added " + added.join(", ") + ".", removed.length && "Removed " + removed.join(", ") + "."]
+      .filter(Boolean).join(" ");
+  }
+
   function compareMatches(original, hypothetical) {
-    const originalByName = new Map(original.map(match => [match.name, match]));
-    const hypotheticalByName = new Map(hypothetical.map(match => [match.name, match]));
-    const names = new Set([...originalByName.keys(), ...hypotheticalByName.keys()]);
-    return [...names].map(name => ({
-      name,
-      original: originalByName.get(name) ?? null,
-      hypothetical: hypotheticalByName.get(name) ?? null
-    }));
+    const originalByUrl = new Map(original.map(match => [match.url, match]));
+    const hypotheticalByUrl = new Map(hypothetical.map(match => [match.url, match]));
+    const urls = new Set([...originalByUrl.keys(), ...hypotheticalByUrl.keys()]);
+    return [...urls].map(url => {
+      const originalMatch = originalByUrl.get(url) ?? null;
+      const hypotheticalMatch = hypotheticalByUrl.get(url) ?? null;
+      return {name: (originalMatch ?? hypotheticalMatch).name, url, original: originalMatch, hypothetical: hypotheticalMatch};
+    });
   }
 
   if (typeof module === "object" && module.exports) {
-    module.exports = {indexedSymptoms, recognizedSymptoms, scoreSymptoms, compareMatches};
+    module.exports = {indexedSymptoms, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
     return;
   }
 
@@ -47,17 +54,29 @@
   }
 
   function scoreCell(match) {
-    return create("td", match ? match.score + "/100" : "Below threshold");
+    const cell = create("td");
+    const score = create("span", match ? match.score + "/100" : "Fewer than 2 shared symptoms", "explorer-score");
+    cell.append(score);
+    if (match) {
+      score.classList.add("explorer-score-value");
+      const shared = create("ul", "", "explorer-shared");
+      for (const symptom of match.matched) shared.append(create("li", symptom));
+      cell.append(shared);
+    }
+    return cell;
   }
 
   function renderComparison(body, original, hypothetical) {
     const rows = compareMatches(original, hypothetical).map(match => {
       const row = create("tr");
-      const name = create("th", match.name);
+      const name = create("th");
       name.scope = "row";
-      if (match.hypothetical) {
-        name.append(create("span", "Shared what-if symptoms include " + match.hypothetical.matched.join(", "), "explorer-shared"));
-      }
+      const source = create("a", match.name);
+      source.href = match.url;
+      source.target = "_blank";
+      source.rel = "noreferrer";
+      const domain = new URL(match.url).hostname.replace(/^www\./, "");
+      name.append(source, create("span", domain, "explorer-domain"));
       row.append(name, scoreCell(match.original), scoreCell(match.hypothetical));
       return row;
     });
@@ -76,7 +95,7 @@
     const panel = create("details", "", "evidence-explorer");
     panel.append(
       create("summary", "What-if evidence explorer"),
-      create("p", "Choose symptoms to see how article similarity changes in this educational exercise. Use the review above for care guidance.")
+      create("p", "Add or remove symptoms to compare article similarity. Your care guidance comes from the original review above.")
     );
 
     const field = create("fieldset");
@@ -96,8 +115,7 @@
     reset.type = "button";
 
     const table = create("table");
-    table.setAttribute("aria-live", "off");
-    table.append(create("caption", "Article similarity"));
+    table.append(create("caption", "Article similarity and shared symptoms"));
     const headings = create("tr");
     for (const title of ["Source article", "Original", "What-if"]) {
       const cell = create("th", title);
@@ -116,18 +134,16 @@
       const selected = controls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
       const hypothetical = scoreSymptoms(ClueEngine, selected);
       renderComparison(body, original, hypothetical);
-      const unchanged = selected.every((symptom, index) => symptom === originalSymptoms[index])
-        && selected.length === originalSymptoms.length;
-      if (unchanged) {
+      const changes = describeChanges(originalSymptoms, selected);
+      if (!changes) {
         status.textContent = "The original symptoms are selected.";
-      } else if (!hypothetical.length) {
-        status.textContent = "No article shares at least two of the selected symptoms.";
-      } else {
-        const count = hypothetical.length;
-        status.textContent = count === 1
-          ? "One article shares at least two of the selected symptoms."
-          : count + " articles share at least two of the selected symptoms.";
+        return;
       }
+      const count = hypothetical.length;
+      const summary = count === 1
+        ? "One article shares at least two of the selected symptoms."
+        : (count || "No") + " articles share at least two of the selected symptoms.";
+      status.textContent = changes + " " + summary;
     };
     field.addEventListener("change", update);
     reset.addEventListener("click", () => {

@@ -36,7 +36,7 @@
 <a class="skip" href="#story">Skip to symptom entry</a>
 <header class="topbar">
   <div class="shell nav-inner">
-    <a href="#main" class="brand" aria-label="Cluewell home"><span class="logomark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Cluewell<span class="brand-dot">.</span></a>
+    <a href="#" class="brand" aria-label="Cluewell home"><span class="logomark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Cluewell<span class="brand-dot">.</span></a>
     <nav aria-label="Main navigation">
       <a class="nav-active" href="#assessment">Symptom check</a>
       <button type="button" class="nav-source" id="sources" aria-haspopup="dialog" aria-controls="sourcesDialog"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Sources</button>
@@ -56,6 +56,15 @@
   </section>
 
   <div class="workspace">
+    <section class="sample-card" id="sample-cases" aria-labelledby="sample-heading" tabindex="-1">
+      <p class="kicker"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg> Demo cases</p>
+      <h2 id="sample-heading">Try a sample story.</h2>
+      <p>Choose a fictional case to fill the form, then select <strong>Review my symptoms</strong>.</p>
+      <div class="sample-list">
+        <button type="button" id="example" class="sample"><span class="sample-icon"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span><span>Cold-like symptoms</span><span class="load-label" aria-hidden="true">Load</span></button>
+        <button type="button" id="urgentExample" class="sample"><span class="sample-icon urgent"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></span><span>Urgent warning sign</span><span class="load-label" aria-hidden="true">Load</span></button>
+      </div>
+    </section>
     <section class="form-card" aria-labelledby="form-heading">
       <div class="form-header">
         <div class="form-title"><span class="form-icon"><svg class="icon" aria-hidden="true"><use href="#i-pen"/></svg></span><h2 id="form-heading">Your symptom story</h2></div>
@@ -64,13 +73,13 @@
       <form id="assessment">
         <label class="sr-only" for="story">Describe your symptoms</label>
         <div class="editor">
-          <textarea id="story" rows="4" placeholder="I woke up with a scratchy throat yesterday. Today my nose is running…" aria-describedby="entry-hint"></textarea>
+          <textarea id="story" rows="4" placeholder="I woke up with a scratchy throat yesterday. Today my nose is running…" aria-describedby="story-privacy"></textarea>
           <div class="editor-actions">
             <button id="voice" type="button" class="tool" aria-controls="voicePanel" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>Voice</button>
             <button id="photo" type="button" class="tool" aria-controls="imagePanel"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg>Add image</button>
           </div>
         </div>
-        <p id="entry-hint" class="entry-hint">Leave out names and identifying details.</p>
+        <div id="entry-hint" class="entry-hint entry-options"><p id="story-privacy">Leave out names and identifying details.</p></div>
         <div id="voicePanel" class="media-panel" hidden>
           <h3>Dictate your story</h3>
           <p>Your browser may send audio to its speech provider. Review the transcript before continuing.</p>
@@ -81,8 +90,10 @@
           <div class="attachment-title"><h3>Image notes</h3><button class="text-action" type="button" id="clearPhoto">Remove image</button></div>
           <img id="imagePreview" alt="Your selected image">
           <p>Extract written text or describe what you see. Compatible browsers can suggest an on-device image description.</p>
-          <button id="extractText" type="button" class="secondary">Extract text</button>
-          <button id="describeImage" type="button" class="secondary">Suggest description</button>
+          <div class="image-tools">
+            <button id="extractText" type="button" class="secondary">Extract text</button>
+            <button id="describeImage" type="button" class="secondary">Suggest description</button>
+          </div>
           <label for="imageNote">Your image description or extracted text</label>
           <textarea id="imageNote" rows="3" placeholder="Add a description or correct the extracted text."></textarea>
           <label class="check-line" for="photoConfirm"><input id="photoConfirm" type="checkbox"><span>I reviewed these notes and want to include them in my check.</span></label>
@@ -93,7 +104,7 @@
           <select id="risk" aria-describedby="risk-hint"><option value="unknown">Unsure or unspecified</option><option value="yes">Yes</option><option value="no">No</option></select>
           <p id="risk-hint" class="entry-hint">For example, you are 65 or older or have a weakened immune system.</p>
         </div>
-        <label class="check-line"><input type="checkbox" id="redflag"><span>I have an emergency warning sign now, such as trouble breathing or persistent chest pain.</span></label>
+        <label class="check-line warning-check"><input type="checkbox" id="redflag"><span>I have an emergency warning sign now, such as trouble breathing or persistent chest pain.</span></label>
         <div class="form-footer">
           <button type="submit" id="submit" class="primary"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>Review my symptoms</button>
           <button id="clear" type="button" class="text-action">Clear entry</button>
@@ -101,36 +112,25 @@
       </form>
     </section>
 
-    <aside class="sidebar" aria-label="Sample cases and context">
-      <section class="sample-card" id="sample-cases" aria-labelledby="sample-heading" tabindex="-1">
-        <p class="kicker"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg> Demo cases</p>
-        <h2 id="sample-heading">Try a sample story.</h2>
-        <p>Load a fictional case, then select Review my symptoms to see the result.</p>
-        <div class="sample-list">
-          <button type="button" id="example" class="sample"><span class="sample-icon"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span><span>Cold-like symptoms</span><span class="load-label">Load</span></button>
-          <button type="button" id="urgentExample" class="sample"><span class="sample-icon urgent"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></span><span>Urgent warning sign</span><span class="load-label">Load</span></button>
-        </div>
-      </section>
-      <section class="context-note">
-        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><div><h3>About this check</h3><p>An educational prototype for adults in the U.S. Results explain source matches and cannot diagnose illness. In an emergency, <a href="tel:911">call 911</a>.</p></div>
-      </section>
+    <aside class="context-note" aria-labelledby="context-heading">
+      <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><div><h3 id="context-heading">About this check</h3><p>An educational prototype for adults in the U.S. Results explain source matches and cannot diagnose illness. In an emergency, <a href="tel:911">call 911</a>.</p></div>
     </aside>
   </div>
   <section id="results" tabindex="-1" aria-label="Your review" aria-live="polite"></section>
 </main>
 <footer class="shell page-footer"><span>Cluewell</span><span>Adult symptom companion · U.S. edition</span></footer>
 <dialog id="sourcesDialog" aria-labelledby="sources-title" aria-describedby="sources-description">
-  <div class="dialog-head"><span class="form-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><button class="icon-button" type="button" id="closeSources" aria-label="Close sources"><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg></button></div>
+  <div class="dialog-head"><span class="form-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><button class="icon-button" type="button" id="closeSources" aria-label="Close sources" autofocus><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg></button></div>
   <h2 id="sources-title">Sources behind the check</h2>
   <p id="sources-description">Each match in your review links to the public guidance behind it. Start with these references.</p>
   <ul class="sources-list">
-    <li><a href="https://www.cdc.gov/common-cold/about/index.html" target="_blank" rel="noreferrer">About the common cold</a><span>Centers for Disease Control and Prevention</span></li>
-    <li><a href="https://www.cdc.gov/common-cold/treatment/index.html" target="_blank" rel="noreferrer">Managing the common cold</a><span>Centers for Disease Control and Prevention</span></li>
-    <li><a href="https://www.cdc.gov/flu/about/flu-vs-covid19.html" target="_blank" rel="noreferrer">Comparing flu and COVID-19</a><span>Centers for Disease Control and Prevention</span></li>
-    <li><a href="https://www.cdc.gov/winter-weather/prevention/index.html" target="_blank" rel="noreferrer">Preventing hypothermia and frostbite</a><span>Centers for Disease Control and Prevention</span></li>
-    <li><a href="https://www.nhs.uk/conditions/hay-fever/" target="_blank" rel="noreferrer">Hay fever</a><span>National Health Service</span></li>
-    <li><a href="https://medlineplus.gov/ency/article/003090.htm" target="_blank" rel="noreferrer">Fever</a><span>MedlinePlus Medical Encyclopedia</span></li>
-    <li><a href="https://medlineplus.gov/ency/article/001927.htm" target="_blank" rel="noreferrer">Recognizing medical emergencies</a><span>MedlinePlus Medical Encyclopedia</span></li>
+    <li><a href="https://www.cdc.gov/common-cold/about/index.html" target="_blank" rel="noreferrer"><span class="source-title">About the common cold</span><span class="source-publisher">Centers for Disease Control and Prevention</span></a></li>
+    <li><a href="https://www.cdc.gov/common-cold/treatment/index.html" target="_blank" rel="noreferrer"><span class="source-title">Managing the common cold</span><span class="source-publisher">Centers for Disease Control and Prevention</span></a></li>
+    <li><a href="https://www.cdc.gov/flu/about/flu-vs-covid19.html" target="_blank" rel="noreferrer"><span class="source-title">Comparing flu and COVID-19</span><span class="source-publisher">Centers for Disease Control and Prevention</span></a></li>
+    <li><a href="https://www.cdc.gov/winter-weather/prevention/index.html" target="_blank" rel="noreferrer"><span class="source-title">Preventing hypothermia and frostbite</span><span class="source-publisher">Centers for Disease Control and Prevention</span></a></li>
+    <li><a href="https://www.nhs.uk/conditions/hay-fever/" target="_blank" rel="noreferrer"><span class="source-title">Hay fever</span><span class="source-publisher">National Health Service</span></a></li>
+    <li><a href="https://medlineplus.gov/ency/article/003090.htm" target="_blank" rel="noreferrer"><span class="source-title">Fever</span><span class="source-publisher">MedlinePlus Medical Encyclopedia</span></a></li>
+    <li><a href="https://medlineplus.gov/ency/article/001927.htm" target="_blank" rel="noreferrer"><span class="source-title">Recognizing medical emergencies</span><span class="source-publisher">MedlinePlus Medical Encyclopedia</span></a></li>
   </ul>
 </dialog>
 <script>
