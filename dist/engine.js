@@ -10,7 +10,7 @@
   const careUrl = "https://www.cdc.gov/common-cold/treatment/index.html";
   const feverUrl = "https://medlineplus.gov/ency/article/003090.htm";
   const coldExposureUrl = "https://www.cdc.gov/winter-weather/prevention/index.html";
-  const limits = "This educational prototype covers three adult respiratory and allergy articles. It cannot diagnose, rule out an emergency, or determine whether it is safe to wait. Scores measure similarity to an article's indexed symptoms.";
+  const limits = "This educational prototype matches English symptom phrases to three adult respiratory and allergy articles. It may miss or misread symptoms and warning signs. It cannot diagnose or determine whether it is safe to wait. Scores measure similarity to an article's indexed symptoms.";
 
   const concepts = [
     ["runny nose", /runny nose|running nose|nose (?:is |keeps )?running|nasal discharge/],
@@ -52,9 +52,9 @@
   // Group related phrases under labels a reader can check against the original note.
   const warningSigns = [
     ["possible heart attack, stroke or anaphylaxis", /(?:having|had|having another|signs of|symptoms of|this (?:is|might be|could be)) (?:a |an )?(?:heart attack|stroke|anaphyla(?:xis|ctic (?:shock|reaction)))/],
-    ["distress with breathing", /(?:can (?:hardly|barely)|struggl(?:e|ing) to) (?:get (?:any )?air|breathe|catch (?:my |a |their )?breath)|no way (?:i|they|she|he) can breathe|cannot (?:get (?:enough |any )?air|take a (?:deep )?breath)|unable to (?:get (?:enough |any )?air|take a breath)|(?:struggl(?:e|ing)|hard) to get (?:enough |any )?air|difficulty (?:in )?speaking (?:in )?full sentences/],
-    ["difficulty breathing", /(?:trouble|difficulty|problems?|struggling|struggle|hard time) (?:with |in |to )?(?:breath(?:e|ing)|catching (?:my |a |their )?breath)|(?:hard|difficult|harder) to breathe|(?:cannot|unable to|barely able to|can barely|no longer able to) (?:breathe|catch (?:my |a |their )?breath)|short(?:ness)? of breath|out of breath|gasping|labou?red breathing|breathless(?:ness)?|chok(?:e|ing)|breathing (?:is |feels )?(?:hard|difficult|labou?red)/],
-    ["chest pain or pressure", /chest (?:pain|pressure|tightness|hurts|discomfort|ache|heaviness)|(?:pain|pressure|tightness|heaviness|squeezing|crushing) (?:in|on|across) (?:my |the |their )?chest|chest (?:is |feels )?(?:tight|heavy|crushed|squeezed)|(?:weight|elephant) (?:is |sitting )*on (?:my |the |their )?chest/],
+    ["distress with breathing", /(?:can (?:hardly|barely)|struggl(?:e|ing) to) (?:get (?:any )?air|breathe|catch (?:my |a |their )?breath)|no way (?:i|they|she|he) can breathe|cannot (?:get (?:enough |any )?air|take a (?:deep )?breath)|unable to (?:get (?:enough |any )?air|take a breath)|(?:struggl(?:e|ing)|hard) to get (?:enough |any )?air|struggl(?:e|ing) for air|difficulty (?:in )?speaking (?:in )?full sentences/],
+    ["difficulty breathing", /(?:trouble|difficulty|problems?|struggling|struggle|hard time) (?:with |in |to )?(?:breath(?:e|ing)|catching (?:my |a |their )?breath)|(?:hard|difficult|harder) to breathe|(?:cannot(?: seem to)?|unable to|barely able to|can barely|no longer able to) (?:breathe|catch (?:my |a |their )?breath)|short(?:ness)? of breath|out of breath|gasping|labou?red breathing|breathless(?:ness)?|chok(?:e|ing)|breathing (?:is |feels )?(?:very |really )?(?:hard|difficult|labou?red)/],
+    ["chest pain or pressure", /chest (?:pain|pressure|tightness|hurts|discomfort|ache|heaviness)|(?:pain|pressure|tightness|heaviness|squeezing|crushing) (?:in|on|across) (?:the (?:middle|center|centre) of )?(?:my |the |their )?chest|chest (?:is |feels )?(?:tight|heavy|crushed|squeezed)|(?:weight|elephant) (?:is |sitting )*on (?:my |the |their )?chest/],
     ["blue or gray lips or skin", /(?:blue|bluish|gr[ae]y) (?:lips|skin|face)|(?:lips|skin|face) (?:are |is |look |turning |turned |looked |seem |have turned )*(?:blue|bluish|gr[ae]y)/],
     ["new confusion or change in alertness", /(?:new(?:ly)? |sudden(?:ly)? |very )?(?:confus(?:ed|ion)|disoriented)|(?:cannot|unable to|difficult to|hard to) (?:wake(?: up)?|stay awake)|unresponsive|unconscious(?:ness)?|passed out|faint(?:ed|ing)|(?:will not|does not) wake up/],
     ["possible stroke warning", /(?:face|facial|mouth) (?:is |has |started )?(?:droop(?:s|ed|ing)?)|(?:slurred|garbled) speech|(?:cannot|unable to) (?:speak|move (?:my |one |the )?(?:arm|leg))|(?:one[- ]sided|sudden) (?:weakness|numbness)|(?:left|right|one) (?:arm|leg|side)(?: of (?:my |the )?body)? (?:is |feels? |went |became |suddenly )*(?:weak|numb)|(?:blinded|lost (?:my )?vision) suddenly|sudden (?:vision loss|loss of vision)/],
@@ -69,14 +69,28 @@
     ["worsening symptoms", /wors(?:ening|ened)|getting worse|came back worse|returned (?:after|worse)|improved (?:and )?then (?:returned|came back)/],
     ["dehydration or difficulty keeping fluids down", /dehydrat(?:ed|ion)|(?:cannot|unable to) (?:drink|keep (?:water|fluids|liquids|anything) down)/],
     ["severe or concerning symptoms", /severe|unbearable|unusual rash|wheez(?:e|es|ing)|blood in (?:my |the )?(?:stool|urine)/],
-    ["higher risk mentioned", /pregnan(?:t|cy)|immunocompromised|immunosuppressed|weakened immune system|on chemotherapy|chronic (?:lung|heart|kidney) disease/],
-    ["persistent fever", /fever[\w ',-]{0,30}(?:for|lasting|lasted|past|over|day) (?:[5-9]|\d{2,}|five|six|seven|eight|nine|ten|eleven|twelve) (?:days?|d\b)|fever[\w ',-]{0,30}(?:for|lasting|lasted|past|over) (?:a|one|\d+) weeks?/]
+    ["higher risk mentioned", /pregnan(?:t|cy)|immunocompromised|immunosuppressed|weakened immune system|on chemotherapy|chronic (?:lung|heart|kidney) disease/]
   ];
+  const feverDays = /[5-9]|[1-9]\d+|five|six|seven|eight|nine|ten|eleven|twelve/.source;
+  const feverDuration = new RegExp([
+    `fever (?:has (?:been |lasted |persisted )?)?(?:for (?:the past )?|lasting |lasted |over )?(?:(?:${feverDays})[- ]days?|(?:a|one|[1-9]\\d*) weeks?)`,
+    `(?:day (?:${feverDays})|(?:${feverDays}) days?) of (?:a |my |the )?fever`
+  ].join("|"));
+  const durationSubjects = ["symptoms?", ...concepts.map(([, pattern]) => pattern.source)].join("|");
+  const symptomDuration = new RegExp(`(?:${durationSubjects}) (?:has been |have been )?(?:for (?:the past )?|lasting |lasted )(?:${/(?:1[1-9]|[2-9]\d|\d{3,}|eleven|twelve|thirteen|fourteen) days|(?:two|three|four|five|six|seven|eight|nine|ten|[2-9]|[1-9]\d+) weeks?/.source})`);
+  const youngAge = /[1-9]|1[0-7]|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen/.source;
+  const spokenAge = `(?:${youngAge})(?:[- ]years?[- ]old|\\s*y/?o)`;
+  const pediatricContext = new RegExp([
+    "(?:my|our|the|a|an) (?:infant|toddler|baby|child|newborn)",
+    `(?:my|our) (?:${spokenAge}|(?:\\d+|${youngAge})[- ]months?[- ]old)`,
+    `(?:i am|i'm) (?:an? )?${spokenAge}`,
+    `(?:i am|i'm|(?:my|our) (?:son|daughter) is) (?:${youngAge})(?=\\s*(?:$|,|and\\b|with\\b))`
+  ].join("|"));
 
   // Translate explicit body readings before sentence splitting so decimal points stay intact.
   // Use a unitless measurement only to request clarification; never infer Celsius or Fahrenheit.
   function labelReading(match, prefix, digits, unit) {
-    const value = Number(digits);
+    const value = Number(digits.replace(",", "."));
     if (!prefix && !unit) return match;
     if (!unit) {
       const unusual = value < 35 || (value >= 39.4 && value < 95) || value >= 103;
@@ -98,11 +112,11 @@
       .replace(/\bdon'?t\b/g, "do not")
       .replace(/\bdoesn'?t\b/g, "does not")
       .replace(/\bdidn'?t\b/g, "did not")
-      .replace(/\bisn'?t\b/g, "is not")
+      .replace(/\b(is|are|was|were|has|have|had)n'?t\b/g, "$1 not")
       .replace(/\b(?:not sure|do not know|cannot tell|not certain)(?: (?:if|whether))?\b/g, "possibly")
       .replace(/\bnot (?:only|just)\b/g, "")
-      .replace(/\b(?:(?:the |it was |it is )?(?:room|outdoor|outside|oven|air|water|weather|ambient)(?: temperature| temp)?(?: is| was| reached| of| at)?\s*[:=]?\s*[+-]?\d+(?:\.\d+)?\s*(?:°|degrees?)?\s*(?:fahrenheit|celsius|[cf])\b)/g, " ambient reading ")
-      .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|measured|at|reached|has reached))?\s*[:=]?\s*)?(\d{2,3}(?:\.\d+)?)(?!\d|\.\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
+      .replace(/\b(?:room|outdoors?|outside|oven|air|water|weather|ambient|forecast)(?: temperature| temp)?(?: (?:is set to|says it will be|will be|is|was|reached|of|at|says|shows))?\s*[:=]?\s*[+-]?\d+(?:[.,]\d+)?\s*(?:°|degrees?)?\s*(?:fahrenheit|celsius|[cf])\b/g, " ambient reading ")
+      .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|says|measured|at|reached|has reached))?\s*[:=]?\s*)?(\d{2,3}(?:[.,]\d+)?)(?!\d|[.,]\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
     return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet)\b|\bor\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
       .filter(Boolean);
   }
@@ -110,9 +124,14 @@
   function asserted(clauses, pattern, warning = false) {
     const matcher = new RegExp("\\b(?:" + pattern.source + ")\\b", "g");
     return clauses.some(clause => {
+      const reference = /^\s*(?:i (?:read|heard) that|(?:the )?(?:instructions|article|guide) (?:says?|mentions?|lists?))\b/.exec(clause);
+      if (reference && !/\b(?:i|we|my|our|he|she|they|his|her|their)\b/.test(clause.slice(reference[0].length))) return false;
       for (const match of clause.matchAll(matcher)) {
         const before = clause.slice(0, match.index);
         const after = clause.slice(match.index + match[0].length);
+        // Keep uncertainty about a current symptom and skip clearly prospective questions.
+        const prospective = /^\s*(?:what )?if (?:i|we|he|she|they) (?:later )?(?:develop|start(?: to)?|begin(?: to)?) (?:a |an )?$/.test(before);
+        if (prospective) continue;
         // Carry a negative across a coordinated list ("no fever, chills or cough").
         // A new affirmative verb resets the scope ("no fever, developed a cough").
         // "No appetite and difficulty breathing" may pair a denial with a new warning.
@@ -159,17 +178,18 @@
     const signals = concepts.filter(([, pattern]) => asserted(clauses, pattern)).map(([label]) => label);
     const matches = retrieve(signals);
     const review = reviewSigns.filter(([, pattern]) => asserted(clauses, pattern)).map(([label]) => label);
+    if (asserted(clauses, feverDuration)) review.push("persistent fever");
     const highReading = asserted(clauses, /high body reading/);
     const unclearReading = asserted(clauses, /ambiguous body temperature/);
     if (highReading) review.push("reported high temperature");
     if (unclearReading) review.push("temperature unit needs confirmation");
     // Duration and lack of improvement are often reported in separate sentences.
-    if (asserted(clauses, /(?:1[1-9]|[2-9]\d) days|(?:two|three|four|[2-9]) weeks/) &&
+    if (asserted(clauses, symptomDuration) &&
         asserted(clauses, /no improvement|not improving|not (?:getting|feeling) better/)) {
       review.push("persistent symptoms without improvement");
     }
     if (options.risk === "yes") review.push("higher-risk context selected");
-    const child = asserted(clauses, /(?:my|our|the|a|an) (?:infant|toddler|baby|child|newborn)|(?:my|our) \d+[- ](?:year|month)[- ]old|i am (?:[1-9]|1[0-7]) years old/);
+    const child = asserted(clauses, pediatricContext);
     if (child || review.length) {
       return {
         level: "prompt", title: child ? "Get age-specific guidance" : "Contact a clinician promptly",
