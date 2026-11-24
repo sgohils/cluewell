@@ -28,6 +28,12 @@ test("the same feature can be included by several sources", () => {
   }
 });
 
+test("whole-body pain wording counts as body aches", () => {
+  const result = analyze("My whole body hurts and I have a cough.");
+  assert.ok(result.signals.includes("body aches"));
+  assert.ok(result.matches.some(({name}) => name === "Common cold"));
+});
+
 test("equal displayed scores remain tied", () => {
   const result = analyze("runny nose, congestion, cough, sneezing, sore throat, headache, body aches");
   assert.equal(result.matches[1].score, 63);
