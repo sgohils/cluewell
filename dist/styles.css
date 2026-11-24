@@ -104,7 +104,7 @@ textarea::placeholder { color:#81757a; opacity:1 }
 .context-row label { font-weight:600 }
 .context-row .entry-hint { flex-basis:100%; margin:0 }
 select { appearance:none; max-width:100%; border:1px solid #d7ccc4; border-radius:7px; background:linear-gradient(45deg,transparent 50%,#766571 50%) calc(100% - 14px) center / 5px 5px no-repeat,linear-gradient(135deg,#766571 50%,transparent 50%) calc(100% - 9px) center/5px 5px no-repeat,var(--surface); padding:.4rem 1.75rem .4rem .7rem; font-size:.875rem; min-height:44px }
-.check-line { display:flex; align-items:flex-start; gap:.55rem; margin-top:.8rem; color:var(--muted); cursor:pointer; line-height:1.45 }
+.check-line { display:flex; align-items:flex-start; gap:.55rem; min-height:44px; margin-top:.8rem; color:var(--muted); cursor:pointer; line-height:1.45 }
 .check-line input { accent-color:var(--plum); margin:.1rem 0 0; width:20px; height:20px; flex:none }
 .warning-check { min-height:44px; padding:.65rem .75rem; border:1px solid #e7d6c9; border-radius:8px; background:#fcf3ea; color:#61372c }
 .warning-check:has(input:checked) { border-color:#a54d31 }
