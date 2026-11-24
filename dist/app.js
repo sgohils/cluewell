@@ -84,7 +84,10 @@
   };
   $('clearPhoto').onclick = () => { clearPhoto(); notify('Image and notes removed.'); $('photo').focus(); };
   $('assessment').addEventListener('input', event => {
-    if (event.target !== $('imageFile')) clearResults();
+    if (event.target === $('imageFile')) return;
+    clearResults();
+    const status = $('mediaStatus').textContent;
+    if (!/^(Listening|Reading the image|Downloading the English text reader|Checking the browser)/.test(status)) notify('');
   });
   note.addEventListener('input', () => { $('photoConfirm').checked = false; photoRevision++; });
   $('sources').onclick = () => $('sourcesDialog').showModal();
@@ -143,7 +146,7 @@
     if (!file || !['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
       sampleRequest++;
       $('imageFile').value = '';
-      notify('Choose a PNG, JPEG or WebP image smaller than 5 MB.');
+      notify('Choose a PNG, JPEG or WebP image up to 5 MiB.');
       return false;
     }
     clearPhoto();

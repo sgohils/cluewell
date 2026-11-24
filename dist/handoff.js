@@ -176,8 +176,19 @@
       const isCurrent = () => copy.isConnected && revision === copyRevision && reviewed.checked && noteBody() === content;
       copyInProgress = true;
       copy.setAttribute('aria-disabled', 'true');
+      draft.readOnly = true;
+      includeReview.disabled = true;
+      reviewed.disabled = true;
+      print.disabled = true;
+      hide.disabled = true;
+      shortcut.disabled = true;
       clearFallback();
-      status.textContent = '';
+      status.textContent = 'Copying handoff…';
+      const slowCopyTimer = window.setTimeout(() => {
+        if (copyInProgress && isCurrent()) {
+          status.textContent = 'Clipboard access is taking longer than expected. Keep this handoff open while your browser finishes.';
+        }
+      }, 5000);
       try {
         await navigator.clipboard.writeText(content);
         if (isCurrent()) status.textContent = 'Handoff copied.';
@@ -193,8 +204,18 @@
           status.textContent = 'Select the handoff text below and use your device’s copy command.';
         }
       } finally {
+        window.clearTimeout(slowCopyTimer);
         copyInProgress = false;
         copy.removeAttribute('aria-disabled');
+        draft.readOnly = false;
+        includeReview.disabled = false;
+        print.disabled = false;
+        hide.disabled = false;
+        shortcut.disabled = false;
+        if (panel.isConnected) {
+          reviewed.disabled = !draft.value.trim();
+          copy.disabled = print.disabled = !reviewed.checked;
+        }
       }
     });
     print.addEventListener('click', () => {

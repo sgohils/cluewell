@@ -76,6 +76,12 @@
 }
 
 #results .source-match p:last-child { margin-bottom: 0 }
+#results .source-match a[target="_blank"]::after {
+  content: " ↗ Opens in a new tab";
+  color: var(--muted);
+  font-size: .8em;
+  font-weight: 400;
+}
 
 #results .match-head {
   display: flex;

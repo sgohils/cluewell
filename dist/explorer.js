@@ -7,6 +7,8 @@
     "vomiting", "diarrhea", "loss of smell", "loss of taste",
     "itchy or watery eyes", "itchy nose or throat"
   ]);
+  const scoringExplanation = "Each score is the shared-symptom count divided by the square root of (selected symptoms × symptoms indexed for that article), multiplied by 100 and rounded. The list under a score shows the shared symptoms. An article needs at least two shared symptoms to appear as a match.";
+  const comparisonRegionLabel = "Article comparison. On small screens, scroll horizontally to compare Original and What-if scores.";
 
   function recognizedSymptoms(signals) {
     return indexedSymptoms.filter(symptom => signals.includes(symptom));
@@ -38,7 +40,7 @@
   }
 
   if (typeof module === "object" && module.exports) {
-    module.exports = {indexedSymptoms, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
+    module.exports = {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches};
     return;
   }
 
@@ -95,7 +97,8 @@
     const panel = create("details", "", "evidence-explorer");
     panel.append(
       create("summary", "What-if evidence explorer"),
-      create("p", "Add or remove symptoms to compare article similarity. Your care guidance comes from the original review above.")
+      create("p", "Add or remove symptoms to compare article similarity. Your care guidance comes from the original review above."),
+      create("p", scoringExplanation, "explorer-method")
     );
 
     const field = create("fieldset");
@@ -126,9 +129,14 @@
     head.append(headings);
     const body = create("tbody");
     table.append(head, body);
+    const tableRegion = create("div", "", "explorer-table-scroll");
+    tableRegion.tabIndex = 0;
+    tableRegion.setAttribute("role", "region");
+    tableRegion.setAttribute("aria-label", comparisonRegionLabel);
+    tableRegion.append(table);
     const status = create("p", "", "explorer-status");
     status.setAttribute("role", "status");
-    panel.append(field, reset, status, table);
+    panel.append(field, reset, status, tableRegion);
 
     const update = () => {
       const selected = controls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);

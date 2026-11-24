@@ -12,6 +12,13 @@
   font-weight: 700;
 }
 
+#results .evidence-explorer .explorer-method {
+  max-width: 72ch;
+  color: #5f4e56;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
 @media (pointer: coarse) {
   #results .evidence-explorer summary {
     padding-block: 11px;
@@ -45,6 +52,12 @@
   cursor: pointer;
 }
 
+@media (pointer: coarse) {
+  #results .explorer-choices label {
+    min-height: 44px;
+  }
+}
+
 #results .explorer-choices input {
   flex: 0 0 auto;
   width: 17px;
@@ -59,6 +72,18 @@
   border-collapse: collapse;
   font-size: .9rem;
   overflow-wrap: anywhere;
+}
+
+#results .explorer-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+@media (max-width: 600px) {
+  #results .evidence-explorer table {
+    min-width: 540px;
+  }
 }
 
 #results .evidence-explorer caption {
@@ -107,7 +132,7 @@
   font-size: .9rem;
 }
 
-#results .evidence-explorer :is(summary, input, button, a):focus-visible {
+#results .evidence-explorer :is(summary, input, button, a, .explorer-table-scroll):focus-visible {
   outline: 3px solid #8b5374;
   outline-offset: 3px;
 }

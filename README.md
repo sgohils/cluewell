@@ -14,6 +14,10 @@ Open http://127.0.0.1:4173. Run `node --test tests/*.test.cjs` with Node 22 or l
 
 ## Reproduce the demo
 
+### Review checks
+
+Run `node --test tests/*.test.cjs` for the engine and comparison regressions. In the standalone build, use Enter to open the evidence explorer, Tab to reach a symptom, Space to toggle it, and the reset button to restore the original selection. On a narrow screen, the comparison table scrolls within its own labeled region. For the handoff, confirm the draft before copying, and check that a clipboard denial leaves text selected for manual copying.
+
 **Fastest judge walkthrough.** Load the cold example and review it. Open the **What-if evidence explorer**, change one symptom, and inspect which articles move. Prepare a clinician handoff, edit the note, and confirm the wording before copying or printing. Then load the urgent example and see which details cause the app to replace the evidence review with emergency guidance.
 
 To publish from GitHub, connect this repository to Netlify. The included configuration selects `dist` as the publish directory. To make a portable HTML copy locally, run `node tools/standalone.cjs Cluewell.html`. The test workflow also builds this copy for download from GitHub Actions.

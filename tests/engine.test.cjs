@@ -61,6 +61,7 @@ for (const story of [
   "Trouble catching my breath.",
   "No fever and cannot breathe.",
   "I have no appetite and difficulty breathing.",
+  "My lips went blue.",
   "No symptoms other than chest pain.",
   "Chest pain went away but just came back.",
   "My slurred speech went away.",
@@ -88,6 +89,29 @@ test("negated signs in a list and explicit corrections do not become positive ev
   assert.deepEqual(result.signals.sort(), ["runny nose", "sneezing"].sort());
   assert.equal(analyze("Chest pain is absent. My sore throat is gone.").level, "unknown");
   assert.deepEqual(analyze("No fever, just a cough and sore throat.").signals.sort(), ["cough", "sore throat"]);
+});
+
+test("a corrective clause after a comma resets an earlier warning denial", () => {
+  const result = analyze("No trouble breathing, actually my chest hurts.");
+  assert.equal(result.level, "emergency");
+  assert.ok(result.signals.includes("chest pain or pressure"));
+});
+
+test("clearly remote warning signs do not become current without a current-time cue", () => {
+  for (const story of [
+    "I had chest pain ten years ago. Today I have a runny nose and sneezing.",
+    "My sister had chest pain years ago. I have a runny nose and sneezing."
+  ]) {
+    assert.equal(analyze(story).level, "guidance", story);
+  }
+  assert.equal(analyze("I had chest pain years ago, but my chest hurts again now.").level, "emergency");
+  for (const story of [
+    "I had chest pain years ago. My chest feels tight.",
+    "My sister had chest pain years ago; now I can hardly breathe.",
+    "I had chest pain years ago, but today I am gasping for air."
+  ]) {
+    assert.equal(analyze(story).level, "emergency", story);
+  }
 });
 
 for (const story of ["", "Cough.", "I fell on my ankle.", "I do not have fever, cough or sneezing.", "sneezing sneezing sneezing"]) {

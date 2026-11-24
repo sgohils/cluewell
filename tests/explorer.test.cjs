@@ -1,7 +1,22 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const engine = require("../dist/engine.js");
-const {indexedSymptoms, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+const {indexedSymptoms, scoringExplanation, comparisonRegionLabel, recognizedSymptoms, scoreSymptoms, describeChanges, compareMatches} = require("../dist/explorer.js");
+
+test("the evidence explorer explains score inputs, rounding, and its match threshold", () => {
+  assert.match(scoringExplanation, /shared-symptom count/);
+  assert.match(scoringExplanation, /selected symptoms/);
+  assert.match(scoringExplanation, /symptoms indexed for that article/);
+  assert.match(scoringExplanation, /rounded/);
+  assert.match(scoringExplanation, /at least two shared symptoms/);
+});
+
+test("the comparison table announces its horizontal scroll behavior to keyboard and screen-reader users", () => {
+  assert.match(comparisonRegionLabel, /Article comparison/);
+  assert.match(comparisonRegionLabel, /small screens/);
+  assert.match(comparisonRegionLabel, /scroll horizontally/);
+  assert.match(comparisonRegionLabel, /Original and What-if scores/);
+});
 
 test("the canonical symptom labels round-trip through the existing engine", () => {
   for (const symptom of indexedSymptoms) {
@@ -39,6 +54,20 @@ test("articles can enter or leave the comparison at the two-symptom threshold", 
   ]);
 });
 
+test("one shared symptom stays below threshold and appears as leaving evidence", () => {
+  const baseline = scoreSymptoms(engine, ["cough", "fever"]);
+  const hypothetical = scoreSymptoms(engine, ["fever", "itchy or watery eyes"]);
+  assert.deepEqual(hypothetical, []);
+
+  const comparison = compareMatches(baseline, hypothetical);
+  assert.deepEqual(comparison.map(({name, original, hypothetical}) => [
+    name, original?.matched.length, hypothetical
+  ]), [
+    ["Common cold", 2, null],
+    ["Flu and COVID-19", 2, null]
+  ]);
+});
+
 test("article URLs preserve provenance for scores on either side", () => {
   const baseline = scoreSymptoms(engine, ["cough", "fever"]);
   const hypothetical = scoreSymptoms(engine, ["cough", "sneezing"]);
@@ -71,4 +100,22 @@ test("original and what-if scores can be equal with different shared symptoms", 
   assert.equal(cold.original.score, cold.hypothetical.score);
   assert.deepEqual(cold.original.matched, ["runny nose", "sneezing"]);
   assert.deepEqual(cold.hypothetical.matched, ["runny nose", "cough"]);
+});
+
+test("comparing a selection with itself keeps one fully populated row per article", () => {
+  const matches = scoreSymptoms(engine, ["runny nose", "sneezing", "cough"]);
+  const before = structuredClone(matches);
+  const comparison = compareMatches(matches, matches);
+
+  assert.deepEqual(comparison.map(({url, original, hypothetical}) => ({
+    url,
+    original: {score: original.score, matched: original.matched},
+    hypothetical: {score: hypothetical.score, matched: hypothetical.matched}
+  })), matches.map(match => ({
+    url: match.url,
+    original: {score: match.score, matched: match.matched},
+    hypothetical: {score: match.score, matched: match.matched}
+  })));
+  assert.equal(new Set(comparison.map(match => match.url)).size, comparison.length);
+  assert.deepEqual(matches, before);
 });

@@ -55,7 +55,7 @@
     ["distress with breathing", /(?:can (?:hardly|barely)|struggl(?:e|ing) to) (?:get (?:any )?air|breathe|catch (?:my |a |their )?breath)|no way (?:i|they|she|he) can breathe|cannot (?:get (?:enough |any )?air|take a (?:deep )?breath)|unable to (?:get (?:enough |any )?air|take a breath)|(?:struggl(?:e|ing)|hard) to get (?:enough |any )?air|struggl(?:e|ing) for air|difficulty (?:in )?speaking (?:in )?full sentences/],
     ["difficulty breathing", /(?:trouble|difficulty|problems?|struggling|struggle|hard time) (?:with |in |to )?(?:breath(?:e|ing)|catching (?:my |a |their )?breath)|(?:hard|difficult|harder) to breathe|(?:cannot(?: seem to)?|unable to|barely able to|can barely|no longer able to) (?:breathe|catch (?:my |a |their )?breath)|short(?:ness)? of breath|out of breath|gasping|labou?red breathing|breathless(?:ness)?|chok(?:e|ing)|breathing (?:is |feels )?(?:very |really )?(?:hard|difficult|labou?red)/],
     ["chest pain or pressure", /chest (?:pain|pressure|tightness|hurts|discomfort|ache|heaviness)|(?:pain|pressure|tightness|heaviness|squeezing|crushing) (?:in|on|across) (?:the (?:middle|center|centre) of )?(?:my |the |their )?chest|chest (?:is |feels )?(?:tight|heavy|crushed|squeezed)|(?:weight|elephant) (?:is |sitting )*on (?:my |the |their )?chest/],
-    ["blue or gray lips or skin", /(?:blue|bluish|gr[ae]y) (?:lips|skin|face)|(?:lips|skin|face) (?:are |is |look |turning |turned |looked |seem |have turned )*(?:blue|bluish|gr[ae]y)/],
+    ["blue or gray lips or skin", /(?:blue|bluish|gr[ae]y) (?:lips|skin|face)|(?:lips|skin|face) (?:are |is |look |turning |turned |looked |seem |have turned |going |went )*(?:blue|bluish|gr[ae]y)/],
     ["new confusion or change in alertness", /(?:new(?:ly)? |sudden(?:ly)? |very )?(?:confus(?:ed|ion)|disoriented)|(?:cannot|unable to|difficult to|hard to) (?:wake(?: up)?|stay awake)|unresponsive|unconscious(?:ness)?|passed out|faint(?:ed|ing)|(?:will not|does not) wake up/],
     ["possible stroke warning", /(?:face|facial|mouth) (?:is |has |started )?(?:droop(?:s|ed|ing)?)|(?:slurred|garbled) speech|(?:cannot|unable to) (?:speak|move (?:my |one |the )?(?:arm|leg))|(?:one[- ]sided|sudden) (?:weakness|numbness)|(?:left|right|one) (?:arm|leg|side)(?: of (?:my |the )?body)? (?:is |feels? |went |became |suddenly )*(?:weak|numb)|(?:blinded|lost (?:my )?vision) suddenly|sudden (?:vision loss|loss of vision)/],
     ["airway or facial swelling", /(?:swollen|swelling) (?:of (?:my |the )?)?(?:tongue|throat|face|lips)|(?:tongue|throat|face|lips) (?:is |are |feels? |started )?(?:swollen|swelling|closing)/],
@@ -111,6 +111,8 @@
   const directReport = /^\s*,?\s*(?:(?:i|we|he|she|they) (?:am|are|is|have|has|feel|feels|may be|might be)|i'm|we're|i've|we've|my|our|his|her|their)\b/;
   const futureQuestion = /^\s*(?:if |what if |what (?:should|can|do) (?:i|we) do if |will )(?:i|we|he|she|they) (?:later )?(?:get|develop|start|begin)\b/;
   const generalQuestion = /^\s*what (?:are|is) (?:the )?(?:(?:warning )?signs|symptoms) of (?:a |an )?/;
+  const remoteHistory = /\b(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|several|many)\s+)?(?:years?|months?) ago\b|\b(?:last|previous) year\b|\b(?:as a child|when i was (?:a )?child)\b/;
+  const currentTime = /\b(?:now|currently|today|again|returned|came back|back again|still|right now|this morning|this evening)\b/;
 
   // Translate explicit body readings before sentence splitting so decimal points stay intact.
   // Use a unitless measurement only to request clarification; never infer Celsius or Fahrenheit.
@@ -142,7 +144,7 @@
       .replace(/\bnot (?:only|just)\b/g, "");
     const normalized = ambientReadings.reduce((story, pattern) => story.replace(pattern, "$1 ambient reading "), expanded)
       .replace(/\b((?:temperature|temp|thermometer|fever)(?: (?:of|is|was|reads?|shows?|says|said|measured|at|reached|has reached|has been at))?\s*[:=]?\s*)?(\d{2,3}(?:[.,]\d+)?)(?!\d|[.,]\d)\s*(?:°\s*|degrees?\s*)?(fahrenheit\b|celsius\b|[fc]\b)?/g, labelReading);
-    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet|despite)\b|\b(?:or|because)\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
+    return normalized.split(/[.!?;\n]|\b(?:but|however|except|other than|now|although|yet|despite)\b|,\s*(?=actually\b)|\b(?:or|because)\s+(?=(?:i|my|we|he|she|they|it|there)\b)|(?:,\s*|\b(?:and|then)\s+)(?=(?:i|my|we|he|she|they|it|there|have|having|feeling|developed|started|with|still|just|only|cannot|unable|experiencing|positive for)\b)/)
       .filter(clause => {
         if (!clause || generalQuestion.test(clause) || futureQuestion.test(clause)) return false;
         const reference = copiedGuidance.exec(clause);
@@ -156,6 +158,8 @@
       for (const match of clause.matchAll(matcher)) {
         const before = clause.slice(0, match.index);
         const after = clause.slice(match.index + match[0].length);
+        // A clearly remote event is not a current warning sign unless the same clause also says it is happening again now.
+        if (warning && remoteHistory.test(clause) && !currentTime.test(clause)) continue;
         // Carry a negative across a coordinated list ("no fever, chills or cough").
         // A new affirmative verb resets the scope ("no fever, developed a cough").
         // "No appetite and difficulty breathing" may pair a denial with a new warning.

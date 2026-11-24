@@ -140,6 +140,7 @@ dialog::backdrop { background:#24182180 }
 .sources-list li { border-top:1px solid var(--line) }
 .sources-list a { display:block; min-height:44px; padding:.6rem .4rem; border-radius:5px; text-decoration:none }
 .sources-list a:hover { background:#f5ede4 }
+.sources-list a[target="_blank"]::after { content:"↗ Opens in a new tab"; display:block; margin-top:.2rem; color:var(--muted); font-size:.78rem; font-weight:400 }
 .sources-list span { display:block }
 .source-title { font-weight:600; text-decoration:underline }
 .source-publisher { margin-top:.13rem; font-size:.85rem; color:var(--muted) }
