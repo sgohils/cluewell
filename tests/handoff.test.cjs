@@ -14,6 +14,10 @@ test('Escape closes the open handoff and restores focus through the shared close
   assert.match(script, /panel\.addEventListener\('keydown', event => \{\s*if \(event\.key === 'Escape' && !panel\.hidden\) \{\s*event\.preventDefault\(\);\s*hideHandoff\(\);/);
   assert.match(script, /const hideHandoff = \(\) => \{[\s\S]*?shortcut\.focus\(\{ preventScroll: true \}\);/);
 });
+
+test('keyboard focus stays visible on handoff controls and its launcher', () => {
+  assert.match(styles, /\.handoff :focus-visible,\s*\.handoff-shortcut:focus-visible\s*\{\s*outline: 3px solid var\(--berry, #68394f\);\s*outline-offset: 3px;/);
+});
 test('closing a reviewed handoff clears confirmation before focus returns', () => {
   const close = script.match(/const hideHandoff = \(\) => \{([\s\S]*?)\n    \};/);
   assert.ok(close, 'the shared close action exists');
