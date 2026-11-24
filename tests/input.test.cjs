@@ -88,3 +88,15 @@ test('a selected current warning sign can be reviewed without a written story', 
   assert.match(content(get('results')), /Input used: warning-sign selection\./);
   assert.equal(get('mediaStatus').textContent, '');
 });
+
+test('unconfirmed image notes stay out of review and are preserved for editing', () => {
+  const {get} = boot();
+  get('imageFile').files = [{type:'image/png', size:12}];
+  get('imageFile').onchange({target:get('imageFile')});
+  get('imageNote').value = 'A printed note with symptom details';
+  get('assessment').submit();
+  assert.equal(get('mediaStatus').textContent, 'Review the image notes and check the confirmation box, or remove the image.');
+  assert.equal(get('imageNote').value, 'A printed note with symptom details');
+  assert.equal(get('results').children.length, 0);
+  assert.equal(get('photoConfirm').ownerDocument.activeElement, get('photoConfirm'));
+});
