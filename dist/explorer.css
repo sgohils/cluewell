@@ -128,6 +128,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+#results .explorer-score-missing {
+  color: #5f4e56;
+  font-size: .88em;
+}
+
 #results .explorer-status {
   font-size: .9rem;
 }

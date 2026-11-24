@@ -186,6 +186,7 @@ test("the browser explorer mounts, updates the comparison, and restores the orig
   panel.descendants().find(node => node.tagName === "fieldset").listeners.change();
   assert.match(status.textContent, /Removed sneezing/);
   assert.ok(tableBody.children.length > 0);
+  assert.ok(panel.descendants().some(node => node.className.split(" ").includes("explorer-score-missing")));
 
   panel.descendants().find(node => node.className.split(" ").includes("explorer-reset")).listeners.click();
   assert.equal(sneezing.checked, true);

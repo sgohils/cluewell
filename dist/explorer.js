@@ -65,7 +65,8 @@
 
   function scoreCell(match) {
     const cell = create("td");
-    const score = create("span", match ? match.score + "/100" : "Fewer than 2 shared symptoms", "explorer-score");
+    const score = create("span", match ? match.score + "/100" : "No match (fewer than 2 shared symptoms)",
+      "explorer-score" + (match ? "" : " explorer-score-missing"));
     cell.append(score);
     if (match) {
       score.classList.add("explorer-score-value");
