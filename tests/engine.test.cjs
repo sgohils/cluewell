@@ -39,6 +39,12 @@ test("allergy symptoms retrieve the NHS article", () => {
   assert.equal(first.name, "Seasonal allergies");
 });
 
+test("plugged nose wording counts as nasal congestion", () => {
+  const result = analyze("My nose is plugged and I have a cough.");
+  assert.ok(result.signals.includes("nasal congestion"));
+  assert.ok(result.matches.some(({name}) => name === "Common cold"));
+});
+
 test("overlapping viral symptoms produce a joint flu and COVID article", () => {
   const [first] = analyze("I feel feverish and I have chills, fatigue, and body aches.").matches;
   assert.equal(first.name, "Flu and COVID-19");
