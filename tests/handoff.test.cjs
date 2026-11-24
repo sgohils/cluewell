@@ -18,6 +18,10 @@ test('Escape closes the open handoff and restores focus through the shared close
 test('keyboard focus stays visible on handoff controls and its launcher', () => {
   assert.match(styles, /\.handoff :focus-visible,\s*\.handoff-shortcut:focus-visible\s*\{\s*outline: 3px solid var\(--berry, #68394f\);\s*outline-offset: 3px;/);
 });
+
+test('print cleanup listens through modern and legacy MediaQueryList APIs', () => {
+  assert.match(script, /if \(printMedia\.addEventListener\) printMedia\.addEventListener\('change', handlePrintMediaChange\);\s*else printMedia\.addListener\(handlePrintMediaChange\);/);
+});
 test('closing a reviewed handoff clears confirmation before focus returns', () => {
   const close = script.match(/const hideHandoff = \(\) => \{([\s\S]*?)\n    \};/);
   assert.ok(close, 'the shared close action exists');

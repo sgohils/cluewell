@@ -17,9 +17,12 @@
     byId('handoff-paper')?.remove();
   };
   window.addEventListener('afterprint', clearPaper);
-  window.matchMedia('print').addEventListener('change', event => {
+  const handlePrintMediaChange = event => {
     if (!event.matches) clearPaper();
-  });
+  };
+  const printMedia = window.matchMedia('print');
+  if (printMedia.addEventListener) printMedia.addEventListener('change', handlePrintMediaChange);
+  else printMedia.addListener(handlePrintMediaChange);
 
   let currentReview;
   let dispose = clearPaper;
