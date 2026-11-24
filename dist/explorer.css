@@ -7,10 +7,16 @@
 }
 
 #results .evidence-explorer summary {
-  width: fit-content;
   cursor: pointer;
   color: #653249;
   font-weight: 700;
+}
+
+@media (pointer: coarse) {
+  #results .evidence-explorer summary {
+    padding-block: 11px;
+    line-height: 22px;
+  }
 }
 
 #results .evidence-explorer fieldset {
@@ -33,7 +39,7 @@
 
 #results .explorer-choices label {
   display: flex;
-  min-height: 32px;
+  min-height: 36px;
   align-items: center;
   gap: 8px;
   cursor: pointer;
@@ -63,29 +69,45 @@
 
 #results .evidence-explorer th,
 #results .evidence-explorer td {
-  padding: 8px 4px;
+  padding: 8px clamp(4px, 1.25vw, 12px);
   border-bottom: 1px solid #d9cdce;
   text-align: left;
   vertical-align: top;
 }
 
 #results .evidence-explorer th:first-child {
-  width: 48%;
+  width: 34%;
+}
+
+#results .evidence-explorer th a {
+  color: #653249;
+  text-underline-offset: .16em;
+}
+
+#results .explorer-domain {
+  display: block;
+  margin-top: 2px;
+  color: #5f4e56;
+  font-size: .8rem;
+  font-weight: 400;
 }
 
 #results .explorer-shared {
-  display: block;
-  margin-top: 2px;
+  margin: 4px 0 0;
+  padding-inline-start: 16px;
   font-size: .82rem;
-  font-weight: 400;
+}
+
+#results .explorer-score-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 #results .explorer-status {
   font-size: .9rem;
 }
 
-#results .explorer-choices input:focus-visible,
-#results .explorer-reset:focus-visible {
+#results .evidence-explorer :is(summary, input, button, a):focus-visible {
   outline: 3px solid #8b5374;
   outline-offset: 3px;
 }
