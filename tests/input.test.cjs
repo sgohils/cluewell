@@ -68,10 +68,23 @@ function boot() {
   return {document, get:id=>document.getElementById(id)};
 }
 
+function content(element) {
+  return element.textContent + element.children.map(content).join(' ');
+}
+
 test('submitting an empty entry keeps the user in the form with a clear prompt', () => {
   const {get} = boot();
   get('assessment').submit();
   assert.equal(get('mediaStatus').textContent, 'Tell us what you are feeling, add reviewed image notes, or select a current warning sign.');
   assert.equal(get('story').ownerDocument.activeElement, get('story'));
   assert.equal(get('results').children.length, 0);
+});
+
+test('a selected current warning sign can be reviewed without a written story', () => {
+  const {get} = boot();
+  get('redflag').checked = true;
+  get('assessment').submit();
+  assert.equal(get('results').dataset.level, 'emergency');
+  assert.match(content(get('results')), /Input used: warning-sign selection\./);
+  assert.equal(get('mediaStatus').textContent, '');
 });
