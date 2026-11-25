@@ -2,7 +2,7 @@
 
 Cluewell helps U.S. adults make sense of a symptom story by showing which details match public-health guidance and what those sources say to do next. Enter a written story, dictate it in a supported browser, or review text extracted from an image.
 
-**Built for Slay Hacks 2026.** [Open the live app](https://cluewell-tfqh.netlify.app/) · [Submission write-up](SUBMISSION.md) · [Download a standalone build from GitHub Actions](https://github.com/sgohils/cluewell/actions/workflows/test.yml)
+ [Open the live app](https://cluewell-tfqh.netlify.app/) · [Submission write-up](SUBMISSION.md) · [Download a standalone build from GitHub Actions](https://github.com/sgohils/cluewell/actions/workflows/test.yml)
 
 ![Cluewell homepage with the symptom story editor and two built-in demo cases](docs/screenshots/symptom-intake.jpg)
 
